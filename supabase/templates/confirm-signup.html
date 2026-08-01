@@ -1,0 +1,48 @@
+<!--
+  Template de e-mail de confirmação de cadastro — Observatório Acriano.
+  Onde colar: Supabase → Authentication → Email Templates → "Confirm signup".
+  Assunto sugerido: Confirme seu cadastro no Observatório Acriano 🌱
+  A variável {{ .ConfirmationURL }} é preenchida automaticamente pelo Supabase.
+-->
+<div style="font-family: -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; background:#f4f7f4; padding:32px 0; margin:0;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px; margin:0 auto; background:#ffffff; border-radius:16px; overflow:hidden; border:1px solid #e2ebe3;">
+    <tr>
+      <td style="background:#14311f; padding:28px 32px; text-align:center;">
+        <div style="font-size:34px; line-height:1;">🌱</div>
+        <h1 style="color:#ffffff; font-size:20px; margin:10px 0 0; font-weight:700;">Observatório Acriano</h1>
+        <p style="color:#9db8a4; font-size:13px; margin:4px 0 0;">da Sócio-bioeconomia</p>
+      </td>
+    </tr>
+    <tr>
+      <td style="padding:32px;">
+        <h2 style="color:#1c3d29; font-size:20px; margin:0 0 12px;">Bem-vindo(a)! 👋</h2>
+        <p style="color:#40564a; font-size:15px; line-height:1.6; margin:0 0 20px;">
+          Que bom ter você por aqui. Falta só um passo para ativar sua conta e apresentar
+          o seu empreendimento na nossa vitrine: confirme o seu e-mail no botão abaixo.
+        </p>
+        <div style="text-align:center; margin:28px 0;">
+          <a href="{{ .ConfirmationURL }}" style="background:#256b3d; color:#ffffff; text-decoration:none; padding:14px 32px; border-radius:12px; font-size:15px; font-weight:600; display:inline-block;">
+            Confirmar meu e-mail
+          </a>
+        </div>
+        <p style="color:#7a8a80; font-size:13px; line-height:1.6; margin:0 0 8px;">
+          Se o botão não funcionar, copie e cole este endereço no seu navegador:
+        </p>
+        <p style="color:#256b3d; font-size:12px; word-break:break-all; margin:0;">
+          {{ .ConfirmationURL }}
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td style="background:#f4f7f4; padding:20px 32px; text-align:center; border-top:1px solid #e2ebe3;">
+        <p style="color:#9aa89f; font-size:12px; line-height:1.5; margin:0;">
+          Você recebeu este e-mail porque criou uma conta no Observatório Acriano.<br/>
+          Se não foi você, pode ignorar esta mensagem com tranquilidade.
+        </p>
+        <p style="color:#b7c2ba; font-size:11px; margin:12px 0 0;">
+          Feito no Acre, com raízes na floresta. 🇧🇷
+        </p>
+      </td>
+    </tr>
+  </table>
+</div>
