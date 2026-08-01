@@ -4,19 +4,27 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Paleta orgânica: floresta, rio, terra, sol amazônico
+        // Paleta principal (temável): dirigida por variáveis CSS para permitir
+        // troca de tema global em tempo real. Os valores padrão (tema "floresta")
+        // ficam em src/styles/index.css.
         forest: {
-          50: '#f0f7f1',
-          100: '#dbeede',
-          200: '#b9ddc0',
-          300: '#8bc499',
-          400: '#57a56d',
-          500: '#35874e',
-          600: '#256b3d',
-          700: '#1d5532',
-          800: '#1a442a',
-          900: '#163825',
-          950: '#0a2015',
+          50: 'rgb(var(--c-forest-50) / <alpha-value>)',
+          100: 'rgb(var(--c-forest-100) / <alpha-value>)',
+          200: 'rgb(var(--c-forest-200) / <alpha-value>)',
+          300: 'rgb(var(--c-forest-300) / <alpha-value>)',
+          400: 'rgb(var(--c-forest-400) / <alpha-value>)',
+          500: 'rgb(var(--c-forest-500) / <alpha-value>)',
+          600: 'rgb(var(--c-forest-600) / <alpha-value>)',
+          700: 'rgb(var(--c-forest-700) / <alpha-value>)',
+          800: 'rgb(var(--c-forest-800) / <alpha-value>)',
+          900: 'rgb(var(--c-forest-900) / <alpha-value>)',
+          950: 'rgb(var(--c-forest-950) / <alpha-value>)',
+        },
+        // Acento (temável)
+        sun: {
+          400: 'rgb(var(--c-sun-400) / <alpha-value>)',
+          500: 'rgb(var(--c-sun-500) / <alpha-value>)',
+          600: 'rgb(var(--c-sun-600) / <alpha-value>)',
         },
         river: {
           50: '#eefbfb',
@@ -30,7 +38,6 @@ export default {
           800: '#1c525e',
           900: '#1b4550',
         },
-        sun: { 400: '#f5b544', 500: '#eea01f', 600: '#d98014' },
         earth: { 400: '#c58d5f', 500: '#a86f43', 600: '#8a5836' },
         // Base editorial (papel + tinta), estilo acadêmico
         paper: '#f6f4ee',

@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
 import { getMetricasAdmin } from '../lib/metricas'
+import { TEMAS, aplicarTema, temaEmCache, carregarTemaGlobal, salvarTemaGlobal } from '../lib/temas'
 import { SectionTitle } from '../components/ui'
 import type { Empreendimento } from '../data/types'
 
@@ -107,6 +108,9 @@ export default function Admin() {
 
       {/* Convite: link compartilhável de cadastro */}
       <ConviteEmpreendedores />
+
+      {/* Configurações do site: tema global */}
+      <ConfiguracoesSite />
 
       {/* Filtros */}
       <div className="mt-8 flex items-center gap-2">
@@ -289,6 +293,129 @@ function ConviteEmpreendedores() {
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+/**
+ * Painel de configurações do site: o admin escolhe o tema (aparência) e aplica
+ * para todos os usuários. A escolha é salva no Supabase (site_config) e carregada
+ * no início de cada visita.
+ */
+function ConfiguracoesSite() {
+  const [selecionado, setSelecionado] = useState<string>(temaEmCache())
+  const [salvo, setSalvo] = useState<string>(temaEmCache())
+  const [salvando, setSalvando] = useState(false)
+  const [msg, setMsg] = useState<{ tipo: 'ok' | 'erro'; texto: string } | null>(null)
+  const salvoRef = useRef(salvo)
+
+  useEffect(() => {
+    carregarTemaGlobal().then((t) => {
+      setSalvo(t)
+      setSelecionado(t)
+      salvoRef.current = t
+    })
+    // Ao sair da tela sem salvar, restaura o tema global (desfaz o preview).
+    return () => aplicarTema(salvoRef.current)
+  }, [])
+
+  function preview(id: string) {
+    setSelecionado(id)
+    aplicarTema(id)
+    setMsg(null)
+  }
+
+  async function aplicarParaTodos() {
+    setSalvando(true)
+    setMsg(null)
+    const { error } = await salvarTemaGlobal(selecionado)
+    setSalvando(false)
+    if (error) {
+      setMsg({ tipo: 'erro', texto: 'Não foi possível salvar: ' + error })
+      return
+    }
+    setSalvo(selecionado)
+    salvoRef.current = selecionado
+    setMsg({ tipo: 'ok', texto: 'Tema aplicado para todos os usuários! 🎉' })
+  }
+
+  const mudou = selecionado !== salvo
+
+  return (
+    <div className="card mt-6 p-6 sm:p-8">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <span className="eyebrow">Configurações do site</span>
+          <h3 className="mt-1 font-display text-xl font-700 text-forest-800">Aparência e tema</h3>
+          <p className="mt-1 text-sm text-forest-500">
+            Escolha o estilo de cores. Ao aplicar, o tema vale para todos os visitantes do site.
+          </p>
+        </div>
+        <button
+          onClick={aplicarParaTodos}
+          disabled={!mudou || salvando}
+          className="btn-primary text-sm disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {salvando ? 'Aplicando…' : mudou ? 'Aplicar para todos' : 'Tema aplicado'}
+        </button>
+      </div>
+
+      {msg && (
+        <p
+          className={`mt-4 rounded-lg px-4 py-2.5 text-sm ${
+            msg.tipo === 'ok' ? 'bg-forest-50 text-forest-700' : 'bg-red-50 text-red-600'
+          }`}
+        >
+          {msg.texto}
+        </p>
+      )}
+
+      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {TEMAS.map((t) => {
+          const ativo = selecionado === t.id
+          return (
+            <button
+              key={t.id}
+              onClick={() => preview(t.id)}
+              className={`flex items-center gap-3 rounded-xl border p-3 text-left transition ${
+                ativo
+                  ? 'border-forest-500 bg-forest-50 ring-2 ring-forest-200'
+                  : 'border-forest-100 hover:border-forest-300 hover:bg-forest-50/50'
+              }`}
+            >
+              {/* Amostra de cores */}
+              <div className="flex shrink-0 -space-x-1.5">
+                {t.swatch.map((cor, i) => (
+                  <span
+                    key={i}
+                    className="h-7 w-7 rounded-full border-2 border-white shadow-sm"
+                    style={{ background: cor }}
+                  />
+                ))}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <p className="font-600 text-forest-800">{t.nome}</p>
+                  {salvo === t.id && (
+                    <span className="rounded-full bg-forest-600 px-1.5 py-0.5 text-[10px] font-700 text-white">
+                      ATIVO
+                    </span>
+                  )}
+                </div>
+                <p className="truncate text-xs text-forest-500">{t.descricao}</p>
+              </div>
+              {ativo && <span className="shrink-0 text-forest-600">✓</span>}
+            </button>
+          )
+        })}
+      </div>
+
+      {mudou && (
+        <p className="mt-4 text-xs text-forest-400">
+          👀 Você está pré-visualizando <span className="font-600">{TEMAS.find((t) => t.id === selecionado)?.nome}</span>.
+          Clique em <span className="font-600">“Aplicar para todos”</span> para salvar, ou saia da página para descartar.
+        </p>
+      )}
     </div>
   )
 }

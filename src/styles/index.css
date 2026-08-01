@@ -4,6 +4,94 @@
 
 :root {
   color-scheme: light;
+
+  /* ==== Tema padrão: Floresta ==== (valores em "R G B" para suportar alpha) */
+  --c-forest-50: 240 247 241;
+  --c-forest-100: 219 238 222;
+  --c-forest-200: 185 221 192;
+  --c-forest-300: 139 196 153;
+  --c-forest-400: 87 165 109;
+  --c-forest-500: 53 135 78;
+  --c-forest-600: 37 107 61;
+  --c-forest-700: 29 85 50;
+  --c-forest-800: 26 68 42;
+  --c-forest-900: 22 56 37;
+  --c-forest-950: 10 32 21;
+  --c-sun-400: 245 181 68;
+  --c-sun-500: 238 160 31;
+  --c-sun-600: 217 128 20;
+}
+
+/* ==== Tema: Oceano (turquesa) ==== */
+:root[data-tema='oceano'] {
+  --c-forest-50: 240 253 250;
+  --c-forest-100: 204 251 241;
+  --c-forest-200: 153 246 228;
+  --c-forest-300: 94 234 212;
+  --c-forest-400: 45 212 191;
+  --c-forest-500: 20 184 166;
+  --c-forest-600: 13 148 136;
+  --c-forest-700: 15 118 110;
+  --c-forest-800: 17 94 89;
+  --c-forest-900: 19 78 74;
+  --c-forest-950: 4 47 46;
+  --c-sun-400: 251 191 36;
+  --c-sun-500: 245 158 11;
+  --c-sun-600: 217 119 6;
+}
+
+/* ==== Tema: Terracota (âmbar/terra) ==== */
+:root[data-tema='terracota'] {
+  --c-forest-50: 251 243 236;
+  --c-forest-100: 246 225 207;
+  --c-forest-200: 236 194 160;
+  --c-forest-300: 224 160 111;
+  --c-forest-400: 209 127 69;
+  --c-forest-500: 185 98 43;
+  --c-forest-600: 154 77 34;
+  --c-forest-700: 124 62 30;
+  --c-forest-800: 100 51 29;
+  --c-forest-900: 82 44 27;
+  --c-forest-950: 45 21 9;
+  --c-sun-400: 245 158 11;
+  --c-sun-500: 217 119 6;
+  --c-sun-600: 180 83 9;
+}
+
+/* ==== Tema: Ametista (roxo) ==== */
+:root[data-tema='ametista'] {
+  --c-forest-50: 250 245 255;
+  --c-forest-100: 243 232 255;
+  --c-forest-200: 233 213 255;
+  --c-forest-300: 216 180 254;
+  --c-forest-400: 192 132 252;
+  --c-forest-500: 168 85 247;
+  --c-forest-600: 147 51 234;
+  --c-forest-700: 126 34 206;
+  --c-forest-800: 107 33 168;
+  --c-forest-900: 88 28 135;
+  --c-forest-950: 59 7 100;
+  --c-sun-400: 251 191 36;
+  --c-sun-500: 245 158 11;
+  --c-sun-600: 217 119 6;
+}
+
+/* ==== Tema: Grafite (neutro elegante) ==== */
+:root[data-tema='grafite'] {
+  --c-forest-50: 248 250 252;
+  --c-forest-100: 241 245 249;
+  --c-forest-200: 226 232 240;
+  --c-forest-300: 203 213 225;
+  --c-forest-400: 148 163 184;
+  --c-forest-500: 100 116 139;
+  --c-forest-600: 71 85 105;
+  --c-forest-700: 51 65 85;
+  --c-forest-800: 30 41 59;
+  --c-forest-900: 15 23 42;
+  --c-forest-950: 2 6 23;
+  --c-sun-400: 251 191 36;
+  --c-sun-500: 245 158 11;
+  --c-sun-600: 217 119 6;
 }
 
 html {
