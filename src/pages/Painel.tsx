@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, Navigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts'
@@ -37,7 +37,8 @@ function mergeSeriesPorDia(
 }
 
 export default function Painel() {
-  const { user, profile, loading } = useAuth()
+  const { user, profile, loading, signOut } = useAuth()
+  const navigate = useNavigate()
   const empreendimentos = useEmpreendimentos()
   const [metricas, setMetricas] = useState<Metricas | null>(null)
   const [carregando, setCarregando] = useState(true)
@@ -69,7 +70,7 @@ export default function Painel() {
           desc="Acompanhe curtidas e visualizações da sua página na vitrine."
         />
         <button
-          onClick={() => window.location.href = '/entrar'}
+          onClick={async () => { await signOut(); navigate('/entrar') }}
           className="btn-ghost mt-1 text-sm"
         >
           Sair
