@@ -10,6 +10,18 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Acessibilidade: desliga animações/transições para quem prefere menos movimento */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 body {
   @apply bg-paper text-ink font-sans antialiased;
 }

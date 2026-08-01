@@ -1,7 +1,8 @@
-import { Suspense, lazy, useEffect, useRef, useState } from 'react'
+import { Suspense, lazy, useEffect } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import Layout from './components/Layout'
 import LoadingScreen from './components/LoadingScreen'
+import TopProgressBar from './components/TopProgressBar'
 import Home from './pages/Home'
 
 const Dashboard = lazy(() => import('./pages/Dashboard'))
@@ -16,24 +17,6 @@ const Painel = lazy(() => import('./pages/Painel'))
 const Admin = lazy(() => import('./pages/Admin'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
-function RouteTransition() {
-  const { pathname } = useLocation()
-  const [loading, setLoading] = useState(false)
-  const first = useRef(true)
-
-  useEffect(() => {
-    if (first.current) {
-      first.current = false
-      return
-    }
-    setLoading(true)
-    const t = setTimeout(() => setLoading(false), 650)
-    return () => clearTimeout(t)
-  }, [pathname])
-
-  return loading ? <LoadingScreen /> : null
-}
-
 export default function App() {
   const { pathname } = useLocation()
 
@@ -43,22 +26,25 @@ export default function App() {
 
   return (
     <Layout>
-      <RouteTransition />
+      <TopProgressBar />
       <Suspense fallback={<LoadingScreen />}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/observatorio" element={<Dashboard />} />
-          <Route path="/vitrine" element={<Vitrine />} />
-          <Route path="/vitrine/:id" element={<EmpreendimentoDetalhe />} />
-          <Route path="/noticias" element={<Noticias />} />
-          <Route path="/legislacao" element={<Legislacao />} />
-          <Route path="/sobre" element={<Sobre />} />
-          <Route path="/cadastro" element={<Cadastro />} />
-          <Route path="/entrar" element={<Login />} />
-          <Route path="/painel" element={<Painel />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        {/* Chave por rota: remonta e reproduz a animação de entrada a cada troca */}
+        <div key={pathname} className="animate-page-in">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/observatorio" element={<Dashboard />} />
+            <Route path="/vitrine" element={<Vitrine />} />
+            <Route path="/vitrine/:id" element={<EmpreendimentoDetalhe />} />
+            <Route path="/noticias" element={<Noticias />} />
+            <Route path="/legislacao" element={<Legislacao />} />
+            <Route path="/sobre" element={<Sobre />} />
+            <Route path="/cadastro" element={<Cadastro />} />
+            <Route path="/entrar" element={<Login />} />
+            <Route path="/painel" element={<Painel />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </div>
       </Suspense>
     </Layout>
   )

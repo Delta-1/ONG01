@@ -61,6 +61,11 @@ export default {
           '0%,100%': { transform: 'rotate(-6deg)' },
           '50%': { transform: 'rotate(6deg)' },
         },
+        // Entrada de página: leve fade + deslize pra cima (troca de aba fluida)
+        'page-in': {
+          '0%': { opacity: '0', transform: 'translateY(12px) scale(0.995)' },
+          '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+        },
       },
       animation: {
         'fade-up': 'fade-up 0.6s ease-out both',
@@ -68,6 +73,7 @@ export default {
         'drift-slow': 'drift-slow 18s ease-in-out infinite',
         'fade-in': 'fade-in 0.3s ease-out both',
         sway: 'sway 5s ease-in-out infinite',
+        'page-in': 'page-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both',
       },
     },
   },
