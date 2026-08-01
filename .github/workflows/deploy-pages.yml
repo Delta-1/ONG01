@@ -1,0 +1,67 @@
+name: Deploy no GitHub Pages
+
+# Publica o site automaticamente a cada push na branch de desenvolvimento.
+# Requer (uma única vez): Settings → Pages → Source: "GitHub Actions".
+on:
+  push:
+    branches:
+      - claude/acre-interactive-map-site-9b2yx7
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Evita deploys concorrentes.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Build (base = /nome-do-repo/)
+        env:
+          # Ajusta o base path para o subdiretório do GitHub Pages.
+          VITE_BASE: /${{ github.event.repository.name }}/
+          # Credenciais do Supabase (opcional). Cadastre em
+          # Settings → Secrets and variables → Actions. Sem elas, o site
+          # funciona com os dados fictícios.
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+        run: npm run build
+
+      - name: Fallback de SPA (404 -> index.html)
+        run: cp dist/index.html dist/404.html
+
+      - name: Configurar Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload do artefato
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy no GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
