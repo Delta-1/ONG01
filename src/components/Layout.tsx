@@ -41,7 +41,7 @@ function MarcaBrasil() {
         marca-brasil.gif
       </span>
     )
-  return <img src={src} alt="Brasil" onError={() => setOk(false)} className="h-6 w-auto opacity-90" />
+  return <img src={src} alt="Brasil" onError={() => setOk(false)} className="h-12 w-auto opacity-90" />
 }
 
 export default function Layout({ children }: { children: ReactNode }) {
@@ -208,8 +208,8 @@ export default function Layout({ children }: { children: ReactNode }) {
               <a href="https://youtube.com" target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:text-white">
                 <YoutubeIcon /> YouTube
               </a>
-              <span className="hidden items-center gap-2 sm:flex">
-                Desenvolvido por <MarcaBrasil />
+              <span className="hidden items-center sm:flex">
+                <MarcaBrasil />
               </span>
             </div>
           </div>
