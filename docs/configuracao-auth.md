@@ -4,14 +4,21 @@ Estas configurações ficam **no painel do Supabase** (não estão no código). 
 documento registra os valores exatos para não se perder. Projeto: **ONG01**
 (`rzsmvlfmjjujbipghmsl`). Site em produção: **https://ong-brasil.vercel.app**
 
-## 1. Confirmação de e-mail (obrigatória para o fluxo de cadastro)
+## 1. Confirmação de e-mail — DESLIGADA (decisão do produto)
+
+Para reduzir a burocracia, o cadastro **não exige confirmação de e-mail**. O fluxo
+tem 2 passos: criar conta → publicar o empreendimento (fica pendente de curadoria).
 
 **Authentication → Providers → Email**
-- Ative **"Confirm email"**.
+- Deixe **"Confirm email"** DESATIVADO.
 
-Com isso, o `signUp()` não cria sessão na hora — o usuário precisa clicar no link
-do e-mail. A tela "Confirme seu e-mail" (`src/pages/Cadastro.tsx`) espera essa
-confirmação e avança sozinha quando ela acontece.
+Com isso, o `signUp()` já cria a sessão na hora e o usuário segue direto para
+publicar. A política de RLS de insert é pública (ver `supabase/migrations/`), então
+a publicação funciona mesmo que a confirmação esteja ligada — mas o recomendado,
+conforme a decisão, é mantê-la desligada.
+
+> Se um dia quiser reativar a confirmação (mais segurança contra spam), reative
+> "Confirm email" aqui e me avise para eu religar a tela de espera no cadastro.
 
 ## 2. URLs de redirecionamento
 

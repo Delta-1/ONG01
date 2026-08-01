@@ -1,23 +1,20 @@
--- Corrige o erro: "new row violates row-level security policy for table empreendimentos"
--- e alinha a política ao fluxo de cadastro com confirmação de e-mail.
+-- Corrige o erro: "new row violates row-level security policy for table empreendimentos".
 --
--- Contexto: o formulário "Enviar para curadoria" (src/pages/Cadastro.tsx) insere um
--- empreendimento como pendente (aprovado=false). O fluxo agora exige que a pessoa
--- confirme o e-mail antes de publicar (tela de espera "Confirme seu e-mail"), então
--- na hora do insert o usuário JÁ está autenticado.
+-- Decisão do produto: o cadastro NÃO exige confirmação de e-mail (menos burocracia).
+-- O formulário "Enviar para curadoria" (src/pages/Cadastro.tsx) insere um
+-- empreendimento como pendente (aprovado=false) logo após a criação da conta.
 --
--- Política: apenas usuários AUTENTICADOS (e-mail confirmado) podem inserir, e somente
--- como pendente (aprovado=false) e sem destaque (destaque=false). Ninguém consegue se
--- auto-aprovar, se auto-destacar, nem enviar de forma anônima (evita spam). A aprovação
--- continua exclusiva do admin (política empreendimentos_update_admin, que exige is_admin()).
+-- Política: a submissão para curadoria é pública, para nunca falhar por falta de
+-- sessão. Fica limitada a pendente (aprovado=false) e sem destaque (destaque=false),
+-- então ninguém consegue se auto-aprovar nem se auto-destacar. A aprovação continua
+-- exclusiva do admin (política empreendimentos_update_admin, que exige is_admin()).
 
 drop policy if exists empreendimentos_insert_empresa on public.empreendimentos;
 drop policy if exists empreendimentos_insert_curadoria on public.empreendimentos;
 
 create policy empreendimentos_insert_curadoria on public.empreendimentos
-  for insert to authenticated
+  for insert to public
   with check (
-    auth.uid() is not null
-    and coalesce(aprovado, false) = false
+    coalesce(aprovado, false) = false
     and coalesce(destaque, false) = false
   );

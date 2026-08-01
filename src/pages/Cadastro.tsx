@@ -1,14 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { SectionTitle } from '../components/ui'
 import { MUNICIPIOS } from '../data/municipios'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
 
 export default function Cadastro() {
-  const [passo, setPasso] = useState<'conta' | 'aguardando' | 'empreendimento' | 'ok'>('conta')
+  const [passo, setPasso] = useState<'conta' | 'empreendimento' | 'ok'>('conta')
   const [loading, setLoading] = useState(false)
   const [erro, setErro] = useState<string | null>(null)
-  const [aviso, setAviso] = useState<string | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
 
   // Campos conta
@@ -25,33 +24,6 @@ export default function Cadastro() {
 
   const navigate = useNavigate()
 
-  // Detecta a confirmação de e-mail: quando o usuário clica no link (mesmo em
-  // outra aba ou ao voltar), a sessão é estabelecida e avançamos automaticamente
-  // para a etapa de publicar o empreendimento.
-  useEffect(() => {
-    if (!isSupabaseConfigured || !supabase) return
-
-    // Se o usuário já chega autenticado (voltou do link de confirmação), pula
-    // direto para a etapa do empreendimento.
-    supabase.auth.getSession().then(({ data }) => {
-      const uid = data.session?.user?.id
-      if (uid) {
-        setUserId(uid)
-        setPasso((p) => (p === 'conta' || p === 'aguardando' ? 'empreendimento' : p))
-      }
-    })
-
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      const uid = session?.user?.id
-      if (uid) {
-        setUserId(uid)
-        setPasso((p) => (p === 'conta' || p === 'aguardando' ? 'empreendimento' : p))
-      }
-    })
-
-    return () => sub.subscription.unsubscribe()
-  }, [])
-
   async function handleConta(e: React.FormEvent) {
     e.preventDefault()
     if (!isSupabaseConfigured || !supabase) {
@@ -63,10 +35,7 @@ export default function Cadastro() {
     const { data, error } = await supabase.auth.signUp({
       email,
       password: senha,
-      options: {
-        data: { role: 'empresa' },
-        emailRedirectTo: `${window.location.origin}/cadastro`,
-      },
+      options: { data: { role: 'empresa' } },
     })
     setLoading(false)
     if (error) {
@@ -74,37 +43,8 @@ export default function Cadastro() {
       return
     }
     setUserId(data.user?.id ?? null)
-    // Se o projeto exige confirmação de e-mail, signUp NÃO cria sessão: vamos
-    // para a tela de espera. Se a confirmação estiver desativada, já há sessão
-    // e seguimos direto para o empreendimento.
-    setPasso(data.session ? 'empreendimento' : 'aguardando')
-  }
-
-  async function reenviarEmail() {
-    if (!isSupabaseConfigured || !supabase) return
-    setErro(null)
-    setAviso(null)
-    setLoading(true)
-    const { error } = await supabase.auth.resend({ type: 'signup', email })
-    setLoading(false)
-    if (error) setErro(error.message)
-    else setAviso('E-mail reenviado! Confira sua caixa de entrada e o spam.')
-  }
-
-  async function verificarConfirmacao() {
-    if (!isSupabaseConfigured || !supabase) return
-    setErro(null)
-    setAviso(null)
-    setLoading(true)
-    const { data } = await supabase.auth.getSession()
-    setLoading(false)
-    const uid = data.session?.user?.id
-    if (uid) {
-      setUserId(uid)
-      setPasso('empreendimento')
-    } else {
-      setAviso('Ainda não confirmamos seu e-mail. Clique no link que enviamos e tente de novo.')
-    }
+    // Sem confirmação de e-mail: seguimos direto para publicar o empreendimento.
+    setPasso('empreendimento')
   }
 
   async function handleEmpreendimento(e: React.FormEvent) {
@@ -116,15 +56,10 @@ export default function Cadastro() {
     setErro(null)
     setLoading(true)
 
-    // Garante que há sessão ativa (e-mail confirmado) antes de publicar.
+    // Sessão (opcional) apenas para vincular ao perfil — a publicação em si não
+    // depende de confirmação de e-mail.
     const { data: sess } = await supabase.auth.getSession()
     const uid = sess.session?.user?.id ?? userId
-    if (!uid) {
-      setLoading(false)
-      setPasso('aguardando')
-      setErro('Confirme seu e-mail antes de publicar seu empreendimento.')
-      return
-    }
 
     // Insere empreendimento (aprovado=false, aguarda curadoria)
     const id = crypto.randomUUID()
@@ -149,11 +84,13 @@ export default function Cadastro() {
       return
     }
 
-    // Vincula empreendimento ao perfil do usuário
-    await supabase
-      .from('profiles')
-      .update({ empreendimento_id: id })
-      .eq('id', uid)
+    // Vincula empreendimento ao perfil do usuário (se autenticado)
+    if (uid) {
+      await supabase
+        .from('profiles')
+        .update({ empreendimento_id: id })
+        .eq('id', uid)
+    }
 
     setLoading(false)
     setPasso('ok')
@@ -197,10 +134,9 @@ export default function Cadastro() {
         <div className="mt-8 flex items-center gap-3">
           {[
             { id: 'conta', label: '1. Criar conta' },
-            { id: 'aguardando', label: '2. Confirmar e-mail' },
-            { id: 'empreendimento', label: '3. Empreendimento' },
+            { id: 'empreendimento', label: '2. Empreendimento' },
           ].map((s, i) => {
-            const ordem = { conta: 0, aguardando: 1, empreendimento: 2, ok: 3 } as const
+            const ordem = { conta: 0, empreendimento: 1, ok: 2 } as const
             const atual = ordem[passo]
             const concluido = i < atual
             const ativo = i === atual
@@ -233,47 +169,6 @@ export default function Cadastro() {
               {loading ? 'Criando conta…' : 'Criar conta e continuar →'}
             </button>
           </form>
-        )}
-
-        {passo === 'aguardando' && (
-          <div className="card mt-6 p-8 text-center sm:p-10">
-            <div className="mx-auto grid h-16 w-16 animate-pulse place-items-center rounded-full bg-forest-100 text-3xl">
-              ✉️
-            </div>
-            <h3 className="mt-4 font-display text-2xl font-700 text-forest-800">Confirme seu e-mail</h3>
-            <p className="mt-3 text-forest-600">
-              Enviamos um link de confirmação para{' '}
-              <span className="font-600 text-forest-800">{email}</span>. Abra seu e-mail e clique no
-              link para ativar sua conta.
-            </p>
-            <p className="mt-2 text-sm text-forest-400">
-              Assim que você confirmar, esta página avança sozinha para o cadastro do empreendimento.
-              (Não esqueça de olhar a caixa de spam.)
-            </p>
-
-            <div className="mt-6 flex items-center justify-center gap-2 text-sm text-forest-500">
-              <span className="h-2 w-2 animate-ping rounded-full bg-forest-500" />
-              Aguardando confirmação…
-            </div>
-
-            {aviso && (
-              <p className="mt-4 rounded-lg bg-forest-50 px-4 py-2.5 text-sm text-forest-700">{aviso}</p>
-            )}
-            {erro && <p className="mt-4 rounded-lg bg-red-50 px-4 py-2.5 text-sm text-red-600">{erro}</p>}
-
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <button className="btn-primary w-full" onClick={verificarConfirmacao} disabled={loading}>
-                {loading ? 'Verificando…' : 'Já confirmei'}
-              </button>
-              <button
-                className="w-full rounded-xl border border-forest-200 px-4 py-2.5 text-sm font-600 text-forest-700 hover:bg-forest-50 disabled:opacity-60"
-                onClick={reenviarEmail}
-                disabled={loading}
-              >
-                Reenviar e-mail
-              </button>
-            </div>
-          </div>
         )}
 
         {passo === 'empreendimento' && (
