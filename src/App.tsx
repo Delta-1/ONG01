@@ -5,6 +5,7 @@ import LoadingScreen from './components/LoadingScreen'
 import TopProgressBar from './components/TopProgressBar'
 import Home from './pages/Home'
 import { aplicarTema, carregarTemaGlobal, temaEmCache } from './lib/temas'
+import { definirEstrutura, carregarEstruturaGlobal } from './lib/estruturas'
 
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const Vitrine = lazy(() => import('./pages/Vitrine'))
@@ -25,11 +26,12 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
   }, [pathname])
 
-  // Tema global: aplica o cache local na hora (evita piscar) e depois sincroniza
-  // com o tema que o admin definiu para todos no Supabase.
+  // Aparência global: aplica o cache local na hora (evita piscar) e depois
+  // sincroniza tema e estrutura que o admin definiu para todos no Supabase.
   useEffect(() => {
     aplicarTema(temaEmCache())
     carregarTemaGlobal().then(aplicarTema)
+    carregarEstruturaGlobal().then(definirEstrutura)
   }, [])
 
   return (

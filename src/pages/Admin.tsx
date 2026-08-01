@@ -4,6 +4,13 @@ import { useAuth } from '../contexts/AuthContext'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
 import { getMetricasAdmin } from '../lib/metricas'
 import { TEMAS, aplicarTema, temaEmCache, carregarTemaGlobal, salvarTemaGlobal } from '../lib/temas'
+import {
+  ESTRUTURAS,
+  useEstrutura,
+  definirEstrutura,
+  carregarEstruturaGlobal,
+  salvarEstruturaGlobal,
+} from '../lib/estruturas'
 import { SectionTitle } from '../components/ui'
 import type { Empreendimento } from '../data/types'
 
@@ -109,7 +116,8 @@ export default function Admin() {
       {/* Convite: link compartilhável de cadastro */}
       <ConviteEmpreendedores />
 
-      {/* Configurações do site: tema global */}
+      {/* Configurações do site: estrutura e tema global */}
+      <ConfiguracaoEstrutura />
       <ConfiguracoesSite />
 
       {/* Filtros */}
@@ -293,6 +301,152 @@ function ConviteEmpreendedores() {
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+/** Miniatura esquemática de cada estrutura, para o preview dos cards. */
+function MiniLayout({ tipo }: { tipo: string }) {
+  const barra = 'bg-forest-600'
+  const bloco = 'bg-forest-100'
+  const wrap = 'flex h-16 w-full overflow-hidden rounded-md border border-forest-200 bg-white p-1'
+
+  if (tipo === 'lateral')
+    return (
+      <div className={`${wrap} gap-1`}>
+        <div className={`h-full w-1/4 rounded-sm ${barra}`} />
+        <div className="flex h-full flex-1 flex-col gap-1">
+          <div className={`h-2 w-2/3 rounded-sm ${bloco}`} />
+          <div className={`flex-1 rounded-sm ${bloco}`} />
+        </div>
+      </div>
+    )
+  if (tipo === 'central')
+    return (
+      <div className={`${wrap} flex-col items-center gap-1`}>
+        <div className={`h-2 w-1/3 rounded-sm ${barra}`} />
+        <div className={`h-1.5 w-1/2 rounded-sm ${barra} opacity-50`} />
+        <div className={`w-full flex-1 rounded-sm ${bloco}`} />
+      </div>
+    )
+  if (tipo === 'minimalista')
+    return (
+      <div className={`${wrap} flex-col gap-1`}>
+        <div className={`h-1.5 w-full rounded-sm ${barra}`} />
+        <div className={`flex-1 rounded-sm ${bloco}`} />
+      </div>
+    )
+  // classica
+  return (
+    <div className={`${wrap} flex-col gap-1`}>
+      <div className={`h-3 w-full rounded-sm ${barra}`} />
+      <div className={`flex-1 rounded-sm ${bloco}`} />
+    </div>
+  )
+}
+
+/**
+ * Painel de estrutura do site: o admin escolhe o layout (clássica, lateral,
+ * central, minimalista) e aplica para todos. Clicar em uma opção pré-visualiza
+ * ao vivo; ao sair sem aplicar, volta à estrutura salva.
+ */
+function ConfiguracaoEstrutura() {
+  const atual = useEstrutura()
+  const [salvo, setSalvo] = useState<string>(atual)
+  const [salvando, setSalvando] = useState(false)
+  const [msg, setMsg] = useState<{ tipo: 'ok' | 'erro'; texto: string } | null>(null)
+  const salvoRef = useRef(salvo)
+
+  useEffect(() => {
+    carregarEstruturaGlobal().then((e) => {
+      setSalvo(e)
+      salvoRef.current = e
+      definirEstrutura(e)
+    })
+    // Ao sair da tela sem salvar, restaura a estrutura global (desfaz o preview).
+    return () => definirEstrutura(salvoRef.current)
+  }, [])
+
+  async function aplicarParaTodos() {
+    setSalvando(true)
+    setMsg(null)
+    const { error } = await salvarEstruturaGlobal(atual)
+    setSalvando(false)
+    if (error) {
+      setMsg({ tipo: 'erro', texto: 'Não foi possível salvar: ' + error })
+      return
+    }
+    setSalvo(atual)
+    salvoRef.current = atual
+    setMsg({ tipo: 'ok', texto: 'Estrutura aplicada para todos os usuários! 🎉' })
+  }
+
+  const mudou = atual !== salvo
+
+  return (
+    <div className="card mt-6 p-6 sm:p-8">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <span className="eyebrow">Configurações do site</span>
+          <h3 className="mt-1 font-display text-xl font-700 text-forest-800">Estrutura do layout</h3>
+          <p className="mt-1 text-sm text-forest-500">
+            Modelos de estrutura para apresentar ao público. Clique para pré-visualizar ao vivo e
+            aplique o preferido para todos os visitantes.
+          </p>
+        </div>
+        <button
+          onClick={aplicarParaTodos}
+          disabled={!mudou || salvando}
+          className="btn-primary text-sm disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {salvando ? 'Aplicando…' : mudou ? 'Aplicar para todos' : 'Estrutura aplicada'}
+        </button>
+      </div>
+
+      {msg && (
+        <p
+          className={`mt-4 rounded-lg px-4 py-2.5 text-sm ${
+            msg.tipo === 'ok' ? 'bg-forest-50 text-forest-700' : 'bg-red-50 text-red-600'
+          }`}
+        >
+          {msg.texto}
+        </p>
+      )}
+
+      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {ESTRUTURAS.map((e) => {
+          const ativo = atual === e.id
+          return (
+            <button
+              key={e.id}
+              onClick={() => definirEstrutura(e.id)}
+              className={`flex flex-col gap-2 rounded-xl border p-3 text-left transition ${
+                ativo
+                  ? 'border-forest-500 bg-forest-50 ring-2 ring-forest-200'
+                  : 'border-forest-100 hover:border-forest-300 hover:bg-forest-50/50'
+              }`}
+            >
+              <MiniLayout tipo={e.preview} />
+              <div className="flex items-center gap-1.5">
+                <p className="font-600 text-forest-800">{e.nome}</p>
+                {salvo === e.id && (
+                  <span className="rounded-full bg-forest-600 px-1.5 py-0.5 text-[10px] font-700 text-white">
+                    ATIVO
+                  </span>
+                )}
+              </div>
+              <p className="text-xs leading-snug text-forest-500">{e.descricao}</p>
+            </button>
+          )
+        })}
+      </div>
+
+      {mudou && (
+        <p className="mt-4 text-xs text-forest-400">
+          👀 Pré-visualizando <span className="font-600">{ESTRUTURAS.find((e) => e.id === atual)?.nome}</span>.
+          Clique em <span className="font-600">“Aplicar para todos”</span> para salvar, ou saia da página para descartar.
+        </p>
+      )}
     </div>
   )
 }
