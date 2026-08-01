@@ -105,6 +105,9 @@ export default function Admin() {
         <ResumoCard label="Visualizações totais" value={totalViews} icon="👁️" />
       </div>
 
+      {/* Convite: link compartilhável de cadastro */}
+      <ConviteEmpreendedores />
+
       {/* Filtros */}
       <div className="mt-8 flex items-center gap-2">
         {([
@@ -207,6 +210,85 @@ export default function Admin() {
           )}
         </div>
       )}
+    </div>
+  )
+}
+
+/**
+ * Card de convite: mostra o link público de cadastro para o admin compartilhar
+ * com empreendedores. Eles abrem o link, criam a conta, confirmam o e-mail e
+ * publicam seu empreendimento — alimentando a plataforma.
+ */
+function ConviteEmpreendedores() {
+  const [copiado, setCopiado] = useState(false)
+  const link = `${window.location.origin}/cadastro`
+  const mensagem =
+    `Olá! 🌱 Cadastre seu empreendimento no Observatório Acriano da Sócio-bioeconomia ` +
+    `e ganhe uma página gratuita na nossa vitrine. É rápido: ${link}`
+
+  async function copiar() {
+    try {
+      await navigator.clipboard.writeText(link)
+    } catch {
+      // Fallback para navegadores/contextos sem clipboard API
+      const el = document.createElement('textarea')
+      el.value = link
+      document.body.appendChild(el)
+      el.select()
+      document.execCommand('copy')
+      document.body.removeChild(el)
+    }
+    setCopiado(true)
+    setTimeout(() => setCopiado(false), 2000)
+  }
+
+  return (
+    <div className="mt-6 overflow-hidden rounded-xl border border-forest-200 bg-gradient-to-br from-forest-800 to-forest-950 p-6 text-white sm:p-8">
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+        <div className="max-w-xl">
+          <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-600 tracking-wide">
+            🔗 Link de convite
+          </span>
+          <h3 className="mt-3 font-display text-xl font-700">Convide empreendedores</h3>
+          <p className="mt-1.5 text-sm text-forest-100/80">
+            Compartilhe o link abaixo. Quem receber cria a conta, confirma o e-mail e publica o
+            próprio empreendimento — direto, sem você precisar cadastrar por eles.
+          </p>
+        </div>
+
+        <div className="w-full lg:max-w-md">
+          <div className="flex items-center gap-2 rounded-lg bg-white/10 p-1.5 ring-1 ring-white/15">
+            <input
+              readOnly
+              value={link}
+              onFocus={(e) => e.currentTarget.select()}
+              className="w-full flex-1 truncate bg-transparent px-3 py-2 text-sm text-white/90 outline-none"
+            />
+            <button
+              onClick={copiar}
+              className="shrink-0 rounded-md bg-white px-4 py-2 text-sm font-700 text-forest-800 transition hover:bg-forest-50"
+            >
+              {copiado ? '✓ Copiado!' : 'Copiar'}
+            </button>
+          </div>
+          <div className="mt-3 flex gap-2">
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent(mensagem)}`}
+              target="_blank"
+              rel="noreferrer"
+              className="flex flex-1 items-center justify-center gap-2 rounded-md bg-white/10 px-4 py-2 text-sm font-600 text-white ring-1 ring-white/15 transition hover:bg-white/20"
+            >
+              💬 WhatsApp
+            </a>
+            <a
+              href={`mailto:?subject=${encodeURIComponent('Cadastre seu empreendimento — Observatório Acriano')}&body=${encodeURIComponent(mensagem)}`}
+              className="flex flex-1 items-center justify-center gap-2 rounded-md bg-white/10 px-4 py-2 text-sm font-600 text-white ring-1 ring-white/15 transition hover:bg-white/20"
+            >
+              ✉️ E-mail
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
