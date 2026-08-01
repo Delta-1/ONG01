@@ -12,9 +12,10 @@ const Legislacao = lazy(() => import('./pages/Legislacao'))
 const Sobre = lazy(() => import('./pages/Sobre'))
 const Cadastro = lazy(() => import('./pages/Cadastro'))
 const Login = lazy(() => import('./pages/Login'))
+const Painel = lazy(() => import('./pages/Painel'))
+const Admin = lazy(() => import('./pages/Admin'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
-/** Mostra a tela de carregamento por um instante a cada troca de aba. */
 function RouteTransition() {
   const { pathname } = useLocation()
   const [loading, setLoading] = useState(false)
@@ -54,6 +55,8 @@ export default function App() {
           <Route path="/sobre" element={<Sobre />} />
           <Route path="/cadastro" element={<Cadastro />} />
           <Route path="/entrar" element={<Login />} />
+          <Route path="/painel" element={<Painel />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

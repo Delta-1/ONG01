@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import LogoPlaceholder from './LogoPlaceholder'
 import { LeafMark } from './Leaf'
+import { useAuth } from '../contexts/AuthContext'
 
 const NAV = [
   { to: '/', label: 'Início', end: true },
@@ -46,6 +47,8 @@ function MarcaBrasil() {
 
 export default function Layout({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false)
+  const { user, profile, signOut } = useAuth()
+  const navigate = useNavigate()
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -63,9 +66,26 @@ export default function Layout({ children }: { children: ReactNode }) {
             <a href="https://youtube.com" target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:text-white">
               <YoutubeIcon className="h-3.5 w-3.5" /> <span className="hidden sm:inline">YouTube</span>
             </a>
-            <Link to="/entrar" className="hover:text-white">
-              Entrar
-            </Link>
+            {user ? (
+              <div className="flex items-center gap-3">
+                <Link
+                  to={profile?.role === 'admin' ? '/admin' : '/painel'}
+                  className="hover:text-white"
+                >
+                  {profile?.role === 'admin' ? 'Admin' : 'Meu painel'}
+                </Link>
+                <button
+                  onClick={async () => { await signOut(); navigate('/') }}
+                  className="hover:text-white"
+                >
+                  Sair
+                </button>
+              </div>
+            ) : (
+              <Link to="/entrar" className="hover:text-white">
+                Entrar
+              </Link>
+            )}
           </div>
         </div>
       </div>

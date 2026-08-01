@@ -1,9 +1,34 @@
 import { useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
 import { SectionTitle } from '../components/ui'
+import { useAuth } from '../contexts/AuthContext'
 import { isSupabaseConfigured } from '../lib/supabase'
 
 export default function Login() {
   const [perfil, setPerfil] = useState<'empresa' | 'adm'>('empresa')
+  const [email, setEmail] = useState('')
+  const [senha, setSenha] = useState('')
+  const [erro, setErro] = useState<string | null>(null)
+  const [carregando, setCarregando] = useState(false)
+  const { signIn } = useAuth()
+  const navigate = useNavigate()
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!isSupabaseConfigured) {
+      setErro('Supabase não configurado. Configure as variáveis de ambiente.')
+      return
+    }
+    setErro(null)
+    setCarregando(true)
+    const err = await signIn(email, senha)
+    setCarregando(false)
+    if (err) {
+      setErro(err === 'Invalid login credentials' ? 'E-mail ou senha incorretos.' : err)
+      return
+    }
+    navigate(perfil === 'adm' ? '/admin' : '/painel')
+  }
 
   return (
     <div className="container-page py-14">
@@ -29,11 +54,14 @@ export default function Login() {
           ))}
         </div>
 
-        <form className="card mt-6 space-y-4 p-6" onSubmit={(e) => e.preventDefault()}>
+        <form className="card mt-6 space-y-4 p-6" onSubmit={handleSubmit}>
           <div>
             <label className="mb-1.5 block text-sm font-600 text-forest-700">E-mail</label>
             <input
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
               className="w-full rounded-xl border border-forest-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-forest-400 focus:ring-2 focus:ring-forest-100"
               placeholder="voce@email.com"
             />
@@ -42,19 +70,28 @@ export default function Login() {
             <label className="mb-1.5 block text-sm font-600 text-forest-700">Senha</label>
             <input
               type="password"
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              required
               className="w-full rounded-xl border border-forest-200 bg-white px-4 py-2.5 text-sm outline-none focus:border-forest-400 focus:ring-2 focus:ring-forest-100"
               placeholder="••••••••"
             />
           </div>
-          <button className="btn-primary w-full">
-            Entrar como {perfil === 'empresa' ? 'empreendedor' : 'administrador'}
+
+          {erro && (
+            <p className="rounded-lg bg-red-50 px-4 py-2.5 text-sm text-red-600">{erro}</p>
+          )}
+
+          <button className="btn-primary w-full" disabled={carregando}>
+            {carregando ? 'Entrando…' : `Entrar como ${perfil === 'empresa' ? 'empreendedor' : 'administrador'}`}
           </button>
         </form>
 
-        <p className="mt-4 text-center text-xs text-forest-400">
-          {isSupabaseConfigured
-            ? 'Supabase conectado. Autenticação real será ativada na Fase 3 (back-end).'
-            : 'Supabase ainda não configurado (defina as variáveis em .env). Autenticação virá na Fase 3.'}
+        <p className="mt-4 text-center text-sm text-forest-500">
+          Não tem conta?{' '}
+          <Link to="/cadastro" className="font-600 text-forest-700 hover:text-forest-900">
+            Cadastre seu empreendimento
+          </Link>
         </p>
       </div>
     </div>
