@@ -1,3 +1,13 @@
+/*
+ * ____  ____      _    ____ ___ _
+ * | __ )|  _ \    / \  / ___|_ _| |
+ * |  _ \| |_) |  / _ \ \___ \| || |
+ * | |_) |  _ <  / ___ \ ___) | || |___
+ * |____/|_| \_\/_/   \_\____/___|_____|
+ *
+ *  Observatório Acriano da Sócio-bioeconomia
+ *  Feito no Acre, com raízes na floresta.  🌱🇧🇷
+ */
 import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import type { ReactNode } from 'react'
@@ -42,7 +52,14 @@ function MarcaBrasil() {
         marca-brasil.gif
       </span>
     )
-  return <img src={src} alt="Brasil" onError={() => setOk(false)} className="h-12 w-auto opacity-90" />
+  return (
+    <img
+      src={src}
+      alt="Brasil"
+      onError={() => setOk(false)}
+      className="mx-auto block h-16 w-auto max-w-full object-contain opacity-90 sm:h-20"
+    />
+  )
 }
 
 export default function Layout({ children }: { children: ReactNode }) {
@@ -228,10 +245,12 @@ export default function Layout({ children }: { children: ReactNode }) {
               <a href="https://youtube.com" target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:text-white">
                 <YoutubeIcon /> YouTube
               </a>
-              <span className="hidden items-center sm:flex">
-                <MarcaBrasil />
-              </span>
             </div>
+          </div>
+
+          {/* Marca Brasil — linha própria, centralizada, nunca ultrapassa a tela */}
+          <div className="container-page flex justify-center pb-6">
+            <MarcaBrasil />
           </div>
         </div>
       </footer>
