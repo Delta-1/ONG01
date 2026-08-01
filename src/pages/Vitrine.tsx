@@ -1,12 +1,11 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { SectionTitle } from '../components/ui'
-import { EMPREENDIMENTOS } from '../data/conteudo'
-import { MUNICIPIOS_POR_CODIGO } from '../data/municipios'
-import type { Empreendimento } from '../data/types'
+import { useEmpreendimentos, useMunicipios } from '../hooks/useData'
+import type { Empreendimento, Municipio } from '../data/types'
 
-function Card({ e }: { e: Empreendimento }) {
-  const mun = MUNICIPIOS_POR_CODIGO[e.municipioCodigo]
+function Card({ e, byCode }: { e: Empreendimento; byCode: Record<string, Municipio> }) {
+  const mun = byCode[e.municipioCodigo]
   return (
     <Link
       to={`/vitrine/${e.id}`}
@@ -26,13 +25,21 @@ function Card({ e }: { e: Empreendimento }) {
   )
 }
 
-function Fileira({ titulo, itens }: { titulo: string; itens: Empreendimento[] }) {
+function Fileira({
+  titulo,
+  itens,
+  byCode,
+}: {
+  titulo: string
+  itens: Empreendimento[]
+  byCode: Record<string, Municipio>
+}) {
   return (
     <div>
       <h3 className="mb-3 font-display text-lg font-700 text-forest-800">{titulo}</h3>
       <div className="no-scrollbar flex gap-4 overflow-x-auto pb-2">
         {itens.map((e) => (
-          <Card key={e.id} e={e} />
+          <Card key={e.id} e={e} byCode={byCode} />
         ))}
       </div>
     </div>
@@ -41,17 +48,19 @@ function Fileira({ titulo, itens }: { titulo: string; itens: Empreendimento[] })
 
 export default function Vitrine() {
   const [busca, setBusca] = useState('')
+  const empreendimentos = useEmpreendimentos()
+  const { byCode } = useMunicipios()
 
   const filtrados = useMemo(
     () =>
-      EMPREENDIMENTOS.filter(
+      empreendimentos.filter(
         (e) =>
           e.aprovado &&
           (e.nome.toLowerCase().includes(busca.toLowerCase()) ||
             e.categoria.toLowerCase().includes(busca.toLowerCase()) ||
             e.produtos.some((p) => p.toLowerCase().includes(busca.toLowerCase()))),
       ),
-    [busca],
+    [busca, empreendimentos],
   )
 
   const porCategoria = useMemo(() => {
@@ -91,7 +100,7 @@ export default function Vitrine() {
           </p>
         )}
         {porCategoria.map(([cat, itens]) => (
-          <Fileira key={cat} titulo={cat} itens={itens} />
+          <Fileira key={cat} titulo={cat} itens={itens} byCode={byCode} />
         ))}
       </div>
     </div>

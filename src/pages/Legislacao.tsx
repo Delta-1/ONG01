@@ -1,5 +1,5 @@
 import { SectionTitle } from '../components/ui'
-import { LEGISLACAO } from '../data/conteudo'
+import { useLegislacao } from '../hooks/useData'
 
 const CORES = {
   Federal: 'bg-forest-100 text-forest-700',
@@ -8,6 +8,7 @@ const CORES = {
 }
 
 export default function Legislacao() {
+  const legislacao = useLegislacao()
   return (
     <div className="container-page py-10 sm:py-14">
       <SectionTitle
@@ -16,7 +17,7 @@ export default function Legislacao() {
         desc="Reunimos o marco legal que sustenta a bioeconomia e protege os povos e a floresta do Acre."
       />
       <div className="mt-10 space-y-4">
-        {LEGISLACAO.sort((a, b) => b.ano - a.ano).map((l) => (
+        {[...legislacao].sort((a, b) => b.ano - a.ano).map((l) => (
           <div key={l.id} className="card flex flex-col gap-3 p-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <div className="flex items-center gap-2">

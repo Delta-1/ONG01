@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { geoMercator, geoPath } from 'd3-geo'
 import type { FeatureCollection, Feature, Geometry } from 'geojson'
-import { MUNICIPIOS_POR_CODIGO } from '../data/municipios'
+import type { Municipio } from '../data/types'
 import type { MetricaDef } from '../data/metricas'
 
 interface MunProps {
@@ -32,9 +32,10 @@ interface Props {
   metrica: MetricaDef
   selectedCode: string | null
   onSelect: (code: string | null) => void
+  byCode: Record<string, Municipio>
 }
 
-export default function AcreMap({ metrica, selectedCode, onSelect }: Props) {
+export default function AcreMap({ metrica, selectedCode, onSelect, byCode }: Props) {
   const [geo, setGeo] = useState<FeatureCollection<Geometry, MunProps> | null>(null)
   const [erro, setErro] = useState<string | null>(null)
   const [hover, setHover] = useState<string | null>(null)
@@ -60,22 +61,22 @@ export default function AcreMap({ metrica, selectedCode, onSelect }: Props) {
     const projection = geoMercator().fitSize([WIDTH, HEIGHT], geo)
     const path = geoPath(projection)
     const values = geo.features.map(
-      (f) => metrica.get(MUNICIPIOS_POR_CODIGO[f.properties.id]?.indicadores ?? ({} as never)) || 0,
+      (f) => metrica.get(byCode[f.properties.id]?.indicadores ?? ({} as never)) || 0,
     )
     const paths: PathItem[] = geo.features.map((f: Feature<Geometry, MunProps>) => {
       const [cx, cy] = path.centroid(f)
       return { code: f.properties.id, name: f.properties.name, d: path(f) ?? '', cx, cy }
     })
     return { paths, domain: [Math.min(...values), Math.max(...values)] as [number, number] }
-  }, [geo, metrica])
+  }, [geo, metrica, byCode])
 
   const norm = (code: string) => {
-    const v = metrica.get(MUNICIPIOS_POR_CODIGO[code]?.indicadores ?? ({} as never)) || 0
+    const v = metrica.get(byCode[code]?.indicadores ?? ({} as never)) || 0
     const [min, max] = domain
     return max === min ? 0.5 : (v - min) / (max - min)
   }
 
-  const hoverMun = hover ? MUNICIPIOS_POR_CODIGO[hover] : null
+  const hoverMun = hover ? byCode[hover] : null
 
   function handleMove(e: React.MouseEvent) {
     const rect = wrapRef.current?.getBoundingClientRect()

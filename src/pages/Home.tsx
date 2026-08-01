@@ -3,13 +3,14 @@ import OrganicBg from '../components/OrganicBg'
 import AcreMapHero from '../components/AcreMapHero'
 import { SectionTitle } from '../components/ui'
 import { LeafMark, FloatingLeaf } from '../components/Leaf'
-import { totaisEstaduais, MUNICIPIOS } from '../data/municipios'
-import { EMPREENDIMENTOS, NOTICIAS } from '../data/conteudo'
+import { useMunicipios, useEmpreendimentos, useNoticias } from '../hooks/useData'
 import { fmtInt, fmtReaisMil, fmtData } from '../lib/format'
 
 export default function Home() {
-  const t = totaisEstaduais()
-  const destaques = EMPREENDIMENTOS.filter((e) => e.destaque)
+  const { municipios, totais: t } = useMunicipios()
+  const empreendimentos = useEmpreendimentos()
+  const noticias = useNoticias()
+  const destaques = empreendimentos.filter((e) => e.destaque).slice(0, 3)
 
   return (
     <div>
@@ -116,7 +117,7 @@ export default function Home() {
           </div>
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {destaques.map((e) => {
-              const mun = MUNICIPIOS.find((m) => m.codigo === e.municipioCodigo)
+              const mun = municipios.find((m) => m.codigo === e.municipioCodigo)
               return (
                 <Link key={e.id} to={`/vitrine/${e.id}`} className="card group overflow-hidden transition hover:shadow-md">
                   <div className="relative h-32 w-full" style={{ background: `linear-gradient(135deg, ${e.cor}, #0a2015)` }}>
@@ -144,7 +145,7 @@ export default function Home() {
           </Link>
         </div>
         <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {NOTICIAS.map((n) => (
+          {noticias.map((n) => (
             <article key={n.id} className="border-t-2 border-forest-200 pt-4">
               <span className="eyebrow !text-river-700">{n.categoria}</span>
               <h3 className="mt-2 font-display text-lg font-700 leading-snug text-ink">{n.titulo}</h3>

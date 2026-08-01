@@ -13,10 +13,9 @@ import {
 } from 'recharts'
 import AcreMap from '../components/AcreMap'
 import { StatCard } from '../components/ui'
-import { MUNICIPIOS, MUNICIPIOS_POR_CODIGO, totaisEstaduais } from '../data/municipios'
+import { useMunicipios, useEmpreendimentos } from '../hooks/useData'
 import { METRICAS, METRICA_POR_ID } from '../data/metricas'
 import type { MetricaId } from '../data/metricas'
-import { EMPREENDIMENTOS } from '../data/conteudo'
 import { fmtInt, fmtReaisMil } from '../lib/format'
 
 const REGIAO_CORES = { 'Vale do Acre': '#256b3d', 'Vale do Juruá': '#1c9aa6' }
@@ -26,28 +25,29 @@ export default function Dashboard() {
   const [selected, setSelected] = useState<string | null>(null)
   const metrica = METRICA_POR_ID[metricaId]
 
-  const totais = useMemo(() => totaisEstaduais(), [])
+  const { municipios, byCode, totais } = useMunicipios()
+  const empreendimentos = useEmpreendimentos()
 
   const ranking = useMemo(
     () =>
-      [...MUNICIPIOS]
+      [...municipios]
         .map((m) => ({ nome: m.nome, valor: metrica.get(m.indicadores), codigo: m.codigo }))
         .sort((a, b) => b.valor - a.valor)
         .slice(0, 8),
-    [metrica],
+    [metrica, municipios],
   )
 
   const porRegiao = useMemo(() => {
     const acc: Record<string, number> = {}
-    MUNICIPIOS.forEach((m) => {
+    municipios.forEach((m) => {
       acc[m.regiao] = (acc[m.regiao] ?? 0) + metrica.get(m.indicadores)
     })
     return Object.entries(acc).map(([name, value]) => ({ name, value }))
-  }, [metrica])
+  }, [metrica, municipios])
 
-  const mun = selected ? MUNICIPIOS_POR_CODIGO[selected] : null
+  const mun = selected ? byCode[selected] : null
   const munEmpreendimentos = selected
-    ? EMPREENDIMENTOS.filter((e) => e.municipioCodigo === selected)
+    ? empreendimentos.filter((e) => e.municipioCodigo === selected)
     : []
 
   return (
@@ -97,7 +97,7 @@ export default function Dashboard() {
             <h3 className="font-display font-700 text-forest-800">Mapa dos 22 municípios</h3>
             <span className="text-xs text-forest-400">{metrica.descricao}</span>
           </div>
-          <AcreMap metrica={metrica} selectedCode={selected} onSelect={setSelected} />
+          <AcreMap metrica={metrica} selectedCode={selected} onSelect={setSelected} byCode={byCode} />
           {/* Legenda */}
           <div className="mt-3 flex items-center gap-3 text-xs text-forest-500">
             <span>menor</span>

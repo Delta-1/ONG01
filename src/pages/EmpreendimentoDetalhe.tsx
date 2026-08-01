@@ -1,10 +1,11 @@
 import { Link, useParams } from 'react-router-dom'
-import { EMPREENDIMENTOS } from '../data/conteudo'
-import { MUNICIPIOS_POR_CODIGO } from '../data/municipios'
+import { useEmpreendimentos, useMunicipios } from '../hooks/useData'
 
 export default function EmpreendimentoDetalhe() {
   const { id } = useParams()
-  const e = EMPREENDIMENTOS.find((x) => x.id === id)
+  const empreendimentos = useEmpreendimentos()
+  const { byCode } = useMunicipios()
+  const e = empreendimentos.find((x) => x.id === id)
 
   if (!e) {
     return (
@@ -17,7 +18,7 @@ export default function EmpreendimentoDetalhe() {
     )
   }
 
-  const mun = MUNICIPIOS_POR_CODIGO[e.municipioCodigo]
+  const mun = byCode[e.municipioCodigo]
 
   return (
     <div>
