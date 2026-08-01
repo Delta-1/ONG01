@@ -5,7 +5,6 @@ name: Deploy no GitHub Pages
 on:
   push:
     branches:
-      - claude/acre-interactive-map-site-9b2yx7
       - main
   workflow_dispatch:
 
@@ -14,10 +13,11 @@ permissions:
   pages: write
   id-token: write
 
-# Evita deploys concorrentes.
+# Um deploy por vez, SEM cancelar o que está em andamento (recomendação
+# oficial do GitHub Pages — cancelar no meio faz o deploy falhar).
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
