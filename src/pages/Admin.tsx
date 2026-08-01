@@ -336,6 +336,20 @@ function MiniLayout({ tipo }: { tipo: string }) {
         <div className={`flex-1 rounded-sm ${bloco}`} />
       </div>
     )
+  if (tipo === 'imersiva')
+    return (
+      <div className={`${wrap} flex-col gap-1`}>
+        <div className="flex items-center justify-between">
+          <div className={`h-2 w-1/4 rounded-sm ${barra}`} />
+          <div className="flex flex-col gap-0.5">
+            <span className={`h-0.5 w-2.5 rounded-sm ${barra}`} />
+            <span className={`h-0.5 w-2.5 rounded-sm ${barra}`} />
+            <span className={`h-0.5 w-2.5 rounded-sm ${barra}`} />
+          </div>
+        </div>
+        <div className={`flex-1 rounded-sm ${bloco}`} />
+      </div>
+    )
   // classica
   return (
     <div className={`${wrap} flex-col gap-1`}>
@@ -413,7 +427,7 @@ function ConfiguracaoEstrutura() {
         </p>
       )}
 
-      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {ESTRUTURAS.map((e) => {
           const ativo = atual === e.id
           return (

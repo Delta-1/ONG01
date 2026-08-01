@@ -6,7 +6,7 @@ export interface Estrutura {
   nome: string
   descricao: string
   /** Miniatura esquemática (blocos) para o preview no card. */
-  preview: 'classica' | 'lateral' | 'central' | 'minimalista'
+  preview: 'classica' | 'lateral' | 'central' | 'minimalista' | 'imersiva'
 }
 
 export const ESTRUTURA_PADRAO = 'classica'
@@ -35,6 +35,12 @@ export const ESTRUTURAS: Estrutura[] = [
     nome: 'Minimalista',
     descricao: 'Barra fina e compacta, foco total no conteúdo.',
     preview: 'minimalista',
+  },
+  {
+    id: 'imersiva',
+    nome: 'Imersiva',
+    descricao: 'Menu em tela cheia com botão flutuante. Ousada e moderna.',
+    preview: 'imersiva',
   },
 ]
 

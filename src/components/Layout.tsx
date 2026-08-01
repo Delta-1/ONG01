@@ -363,11 +363,86 @@ function ShellLateral({ children }: { children: ReactNode }) {
   )
 }
 
+/** Imersiva: header minimalista com botão flutuante que abre um menu em tela cheia. */
+function ShellImersiva({ children }: { children: ReactNode }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="flex min-h-screen flex-col">
+      <header className="sticky top-0 z-40 bg-paper/80 backdrop-blur">
+        <div className="container-page flex h-16 items-center justify-between">
+          <Link to="/" className="font-display text-lg font-700 text-ink">
+            Observatório Acriano
+          </Link>
+          <button
+            onClick={() => setOpen(true)}
+            className="flex items-center gap-2 rounded-full border border-forest-300 px-4 py-2 text-sm font-600 text-forest-800 transition hover:bg-forest-50"
+          >
+            <span className="flex flex-col gap-1">
+              <span className="block h-0.5 w-5 bg-current" />
+              <span className="block h-0.5 w-5 bg-current" />
+              <span className="block h-0.5 w-5 bg-current" />
+            </span>
+            Menu
+          </button>
+        </div>
+      </header>
+
+      {/* Overlay de tela cheia */}
+      {open && (
+        <div className="animate-fade-in fixed inset-0 z-[60] flex flex-col bg-forest-950 text-white">
+          <div className="container-page flex h-16 items-center justify-between">
+            <span className="font-display text-lg font-700">Observatório Acriano</span>
+            <button
+              onClick={() => setOpen(false)}
+              aria-label="Fechar menu"
+              className="grid h-10 w-10 place-items-center rounded-full border border-white/30 text-lg transition hover:bg-white/10"
+            >
+              ✕
+            </button>
+          </div>
+          <nav className="flex flex-1 flex-col items-center justify-center gap-3 px-4">
+            {NAV.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.end}
+                onClick={() => setOpen(false)}
+                className={({ isActive }) =>
+                  `font-display text-3xl font-700 transition sm:text-4xl ${
+                    isActive ? 'text-sun-400' : 'text-white/80 hover:text-white'
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
+            <Link
+              to="/cadastro"
+              onClick={() => setOpen(false)}
+              className="mt-6 rounded-full bg-sun-500 px-8 py-3 text-lg font-700 text-forest-950 transition hover:bg-sun-400"
+            >
+              Cadastre seu negócio
+            </Link>
+          </nav>
+          <div className="flex items-center justify-center gap-6 pb-8 text-white/70">
+            <a href="https://instagram.com" target="_blank" rel="noreferrer" className="hover:text-white"><InstagramIcon /></a>
+            <a href="https://youtube.com" target="_blank" rel="noreferrer" className="hover:text-white"><YoutubeIcon /></a>
+          </div>
+        </div>
+      )}
+
+      <main className="flex-1">{children}</main>
+      <SiteFooter />
+    </div>
+  )
+}
+
 const SHELLS: Record<string, (p: { children: ReactNode }) => JSX.Element> = {
   classica: ShellClassica,
   lateral: ShellLateral,
   central: ShellCentral,
   minimalista: ShellMinimalista,
+  imersiva: ShellImersiva,
 }
 
 export default function Layout({ children }: { children: ReactNode }) {
