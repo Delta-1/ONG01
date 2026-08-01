@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import type { ReactNode } from 'react'
+import LogoPlaceholder from './LogoPlaceholder'
+import { LeafMark } from './Leaf'
 
 const NAV = [
   { to: '/', label: 'Início', end: true },
@@ -11,23 +13,35 @@ const NAV = [
   { to: '/sobre', label: 'Sobre' },
 ]
 
-function Leaf() {
+function InstagramIcon({ className = 'h-4 w-4' }: { className?: string }) {
   return (
-    <svg viewBox="0 0 32 32" className="h-7 w-7" aria-hidden="true">
-      <path
-        d="M28 4C14 4 6 12 6 24c0 2 .3 4 .3 4s10 .3 16-5.7C29 15.5 28 4 28 4Z"
-        fill="currentColor"
-      />
-      <path
-        d="M10 26C14 18 20 12 26 8"
-        stroke="#fff"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        fill="none"
-        opacity=".7"
-      />
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.8">
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
     </svg>
   )
+}
+function YoutubeIcon({ className = 'h-4 w-4' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="1.8">
+      <rect x="2.5" y="5.5" width="19" height="13" rx="4" />
+      <path d="M10 9.5l5 2.5-5 2.5v-5Z" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+
+/** Gif pequeno da marca no rodapé (com fallback se o arquivo não existir). */
+function MarcaBrasil() {
+  const [ok, setOk] = useState(true)
+  const src = `${import.meta.env.BASE_URL}marca-brasil.gif`
+  if (!ok)
+    return (
+      <span className="rounded-sm border border-dashed border-forest-600 px-2 py-1 text-[9px] uppercase tracking-widest text-forest-300">
+        marca-brasil.gif
+      </span>
+    )
+  return <img src={src} alt="Brasil" onError={() => setOk(false)} className="h-6 w-auto opacity-90" />
 }
 
 export default function Layout({ children }: { children: ReactNode }) {
@@ -35,33 +49,51 @@ export default function Layout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-40 border-b border-forest-100 bg-forest-50/85 backdrop-blur">
-        <div className="container-page flex h-16 items-center justify-between gap-4">
-          <Link to="/" className="flex items-center gap-2.5 text-forest-700">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-forest-600 text-white">
-              <Leaf />
-            </span>
+      {/* Barra utilitária superior (estilo institucional) */}
+      <div className="bg-forest-950 text-forest-100">
+        <div className="container-page flex h-9 items-center justify-between text-[12px]">
+          <span className="hidden items-center gap-2 sm:flex">
+            <LeafMark className="h-3.5 w-3.5 text-forest-400" />
+            Estado do Acre · Amazônia
+          </span>
+          <div className="flex items-center gap-4">
+            <a href="https://instagram.com" target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:text-white">
+              <InstagramIcon className="h-3.5 w-3.5" /> <span className="hidden sm:inline">Instagram</span>
+            </a>
+            <a href="https://youtube.com" target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:text-white">
+              <YoutubeIcon className="h-3.5 w-3.5" /> <span className="hidden sm:inline">YouTube</span>
+            </a>
+            <Link to="/entrar" className="hover:text-white">
+              Entrar
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Cabeçalho principal */}
+      <header className="sticky top-0 z-40 border-b border-forest-200 bg-paper/90 backdrop-blur">
+        <div className="container-page flex h-20 items-center justify-between gap-4">
+          <Link to="/" className="flex items-center gap-3">
+            <LogoPlaceholder />
             <span className="leading-tight">
-              <span className="block font-display text-sm font-700 text-forest-800 sm:text-base">
+              <span className="block font-display text-lg font-700 text-ink sm:text-xl">
                 Observatório Acriano
               </span>
-              <span className="block text-[11px] font-medium text-forest-500">
-                da Sócio-bioeconomia
-              </span>
+              <span className="eyebrow block">da Sócio-bioeconomia</span>
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-1 lg:flex">
+          <nav className="hidden items-center gap-6 lg:flex">
             {NAV.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 end={item.end}
                 className={({ isActive }) =>
-                  `rounded-full px-3.5 py-2 text-sm font-medium transition ${
+                  `border-b-2 py-1 text-sm font-medium transition ${
                     isActive
-                      ? 'bg-forest-100 text-forest-800'
-                      : 'text-forest-600 hover:bg-forest-100/60 hover:text-forest-800'
+                      ? 'border-sun-500 text-ink'
+                      : 'border-transparent text-forest-700 hover:border-forest-300 hover:text-ink'
                   }`
                 }
               >
@@ -70,32 +102,25 @@ export default function Layout({ children }: { children: ReactNode }) {
             ))}
           </nav>
 
-          <div className="hidden items-center gap-2 lg:flex">
-            <Link to="/entrar" className="btn-ghost">
-              Entrar
-            </Link>
+          <div className="hidden items-center gap-2 xl:flex">
             <Link to="/cadastro" className="btn-primary">
               Cadastre seu negócio
             </Link>
           </div>
 
           <button
-            className="grid h-10 w-10 place-items-center rounded-lg border border-forest-200 text-forest-700 lg:hidden"
+            className="grid h-10 w-10 place-items-center rounded-sm border border-forest-300 text-forest-800 lg:hidden"
             onClick={() => setOpen((v) => !v)}
             aria-label="Abrir menu"
           >
             <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
-              {open ? (
-                <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
-              ) : (
-                <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
-              )}
+              {open ? <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" /> : <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />}
             </svg>
           </button>
         </div>
 
         {open && (
-          <div className="border-t border-forest-100 bg-forest-50 lg:hidden">
+          <div className="border-t border-forest-100 bg-paper lg:hidden">
             <div className="container-page flex flex-col gap-1 py-3">
               {NAV.map((item) => (
                 <NavLink
@@ -104,22 +129,17 @@ export default function Layout({ children }: { children: ReactNode }) {
                   end={item.end}
                   onClick={() => setOpen(false)}
                   className={({ isActive }) =>
-                    `rounded-lg px-3 py-2.5 text-sm font-medium ${
-                      isActive ? 'bg-forest-100 text-forest-800' : 'text-forest-600'
+                    `rounded-sm px-3 py-2.5 text-sm font-medium ${
+                      isActive ? 'bg-forest-100 text-ink' : 'text-forest-700'
                     }`
                   }
                 >
                   {item.label}
                 </NavLink>
               ))}
-              <div className="mt-2 flex gap-2">
-                <Link to="/entrar" className="btn-ghost flex-1" onClick={() => setOpen(false)}>
-                  Entrar
-                </Link>
-                <Link to="/cadastro" className="btn-primary flex-1" onClick={() => setOpen(false)}>
-                  Cadastrar
-                </Link>
-              </div>
+              <Link to="/cadastro" className="btn-primary mt-2" onClick={() => setOpen(false)}>
+                Cadastre seu negócio
+              </Link>
             </div>
           </div>
         )}
@@ -127,16 +147,15 @@ export default function Layout({ children }: { children: ReactNode }) {
 
       <main className="flex-1">{children}</main>
 
-      <footer className="mt-16 border-t border-forest-100 bg-forest-900 text-forest-100">
-        <div className="container-page grid gap-8 py-12 md:grid-cols-4">
+      {/* Rodapé */}
+      <footer className="mt-20 border-t-4 border-sun-500 bg-forest-950 text-forest-100">
+        <div className="container-page grid gap-8 py-14 md:grid-cols-4">
           <div className="md:col-span-2">
-            <div className="flex items-center gap-2.5 text-white">
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-forest-600">
-                <Leaf />
-              </span>
+            <div className="flex items-center gap-3 text-white">
+              <LogoPlaceholder variant="light" />
               <span className="font-display text-lg font-700">Observatório Acriano</span>
             </div>
-            <p className="mt-4 max-w-md text-sm text-forest-200">
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-forest-200">
               Plataforma pública de dados, legislação e valorização dos empreendimentos da
               sociobiodiversidade e da bioeconomia do estado do Acre.
             </p>
@@ -145,7 +164,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             </p>
           </div>
           <div>
-            <h4 className="font-display text-sm font-600 text-white">Navegação</h4>
+            <h4 className="eyebrow !text-forest-300">Navegação</h4>
             <ul className="mt-3 space-y-2 text-sm text-forest-200">
               {NAV.map((i) => (
                 <li key={i.to}>
@@ -157,7 +176,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             </ul>
           </div>
           <div>
-            <h4 className="font-display text-sm font-600 text-white">Participe</h4>
+            <h4 className="eyebrow !text-forest-300">Participe</h4>
             <ul className="mt-3 space-y-2 text-sm text-forest-200">
               <li>
                 <Link to="/cadastro" className="hover:text-white">
@@ -177,10 +196,22 @@ export default function Layout({ children }: { children: ReactNode }) {
             </ul>
           </div>
         </div>
+
+        {/* Barra de contatos / créditos */}
         <div className="border-t border-forest-800">
-          <div className="container-page py-5 text-xs text-forest-400">
-            © {new Date().getFullYear()} Observatório Acriano da Sócio-bioeconomia. Todos os direitos
-            reservados.
+          <div className="container-page flex flex-col items-center justify-between gap-4 py-5 text-xs text-forest-400 sm:flex-row">
+            <span>© {new Date().getFullYear()} Observatório Acriano da Sócio-bioeconomia.</span>
+            <div className="flex items-center gap-4">
+              <a href="https://instagram.com" target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:text-white">
+                <InstagramIcon /> Instagram
+              </a>
+              <a href="https://youtube.com" target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:text-white">
+                <YoutubeIcon /> YouTube
+              </a>
+              <span className="hidden items-center gap-2 sm:flex">
+                Desenvolvido por <MarcaBrasil />
+              </span>
+            </div>
           </div>
         </div>
       </footer>

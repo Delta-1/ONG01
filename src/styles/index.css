@@ -11,7 +11,15 @@ html {
 }
 
 body {
-  @apply bg-forest-50 text-forest-950 font-sans antialiased;
+  @apply bg-paper text-ink font-sans antialiased;
+}
+
+/* Títulos com serifa — ar institucional/acadêmico */
+h1,
+h2,
+h3,
+h4 {
+  @apply font-display;
 }
 
 /* Scrollbar horizontal discreta para as fileiras da vitrine (estilo estante) */
@@ -27,19 +35,32 @@ body {
   .container-page {
     @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
   }
+  /* Cartões editoriais: cantos sóbrios, borda fina */
   .card {
-    @apply rounded-2xl border border-forest-100 bg-white shadow-sm;
+    @apply rounded-md border border-forest-100 bg-white shadow-sm;
   }
+  /* Botões retangulares sóbrios (menos "startup", mais institucional) */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition;
+    @apply inline-flex items-center justify-center gap-2 rounded-sm px-5 py-2.5 text-sm font-semibold tracking-wide transition;
   }
   .btn-primary {
-    @apply btn bg-forest-600 text-white hover:bg-forest-700 shadow-sm;
+    @apply btn bg-forest-800 text-white hover:bg-forest-900 shadow-sm;
   }
   .btn-ghost {
-    @apply btn border border-forest-200 text-forest-700 hover:bg-forest-100;
+    @apply btn border border-forest-300 text-forest-800 hover:bg-forest-50;
   }
   .chip {
     @apply inline-flex items-center gap-1.5 rounded-full bg-forest-100 px-3 py-1 text-xs font-medium text-forest-700;
+  }
+  /* Sobrescrito em versalete espaçado — assinatura visual acadêmica */
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-[0.22em] text-forest-600;
+  }
+  /* Filete/regra fina de separação */
+  .rule {
+    @apply h-px w-12 bg-sun-500;
+  }
+  .link-underline {
+    @apply underline decoration-forest-300 decoration-1 underline-offset-4 hover:decoration-forest-600;
   }
 }

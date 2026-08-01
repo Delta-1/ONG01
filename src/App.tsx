@@ -1,6 +1,7 @@
-import { Suspense, lazy } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Suspense, lazy, useEffect, useRef, useState } from 'react'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import Layout from './components/Layout'
+import LoadingScreen from './components/LoadingScreen'
 import Home from './pages/Home'
 
 const Dashboard = lazy(() => import('./pages/Dashboard'))
@@ -13,18 +14,36 @@ const Cadastro = lazy(() => import('./pages/Cadastro'))
 const Login = lazy(() => import('./pages/Login'))
 const NotFound = lazy(() => import('./pages/NotFound'))
 
-function Loader() {
-  return (
-    <div className="container-page grid place-items-center py-32">
-      <div className="h-8 w-8 animate-spin rounded-full border-2 border-forest-200 border-t-forest-600" />
-    </div>
-  )
+/** Mostra a tela de carregamento por um instante a cada troca de aba. */
+function RouteTransition() {
+  const { pathname } = useLocation()
+  const [loading, setLoading] = useState(false)
+  const first = useRef(true)
+
+  useEffect(() => {
+    if (first.current) {
+      first.current = false
+      return
+    }
+    setLoading(true)
+    const t = setTimeout(() => setLoading(false), 650)
+    return () => clearTimeout(t)
+  }, [pathname])
+
+  return loading ? <LoadingScreen /> : null
 }
 
 export default function App() {
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior })
+  }, [pathname])
+
   return (
     <Layout>
-      <Suspense fallback={<Loader />}>
+      <RouteTransition />
+      <Suspense fallback={<LoadingScreen />}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/observatorio" element={<Dashboard />} />

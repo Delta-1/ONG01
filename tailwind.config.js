@@ -30,19 +30,16 @@ export default {
           800: '#1c525e',
           900: '#1b4550',
         },
-        sun: {
-          400: '#f5b544',
-          500: '#eea01f',
-          600: '#d98014',
-        },
-        earth: {
-          400: '#c58d5f',
-          500: '#a86f43',
-          600: '#8a5836',
-        },
+        sun: { 400: '#f5b544', 500: '#eea01f', 600: '#d98014' },
+        earth: { 400: '#c58d5f', 500: '#a86f43', 600: '#8a5836' },
+        // Base editorial (papel + tinta), estilo acadêmico
+        paper: '#f6f4ee',
+        ink: '#14261c',
       },
       fontFamily: {
-        display: ['"Poppins"', 'system-ui', 'sans-serif'],
+        // Títulos com serifa (ar acadêmico); interface em sans
+        display: ['"Source Serif 4"', 'Georgia', 'Cambria', 'serif'],
+        serif: ['"Source Serif 4"', 'Georgia', 'serif'],
         sans: ['"Inter"', 'system-ui', 'sans-serif'],
       },
       keyframes: {
@@ -51,19 +48,26 @@ export default {
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         float: {
-          '0%,100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-10px)' },
+          '0%,100%': { transform: 'translateY(0) rotate(0deg)' },
+          '50%': { transform: 'translateY(-10px) rotate(3deg)' },
         },
         'drift-slow': {
           '0%': { transform: 'translate(0,0)' },
           '50%': { transform: 'translate(-18px,10px)' },
           '100%': { transform: 'translate(0,0)' },
         },
+        'fade-in': { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+        sway: {
+          '0%,100%': { transform: 'rotate(-6deg)' },
+          '50%': { transform: 'rotate(6deg)' },
+        },
       },
       animation: {
         'fade-up': 'fade-up 0.6s ease-out both',
         float: 'float 6s ease-in-out infinite',
         'drift-slow': 'drift-slow 18s ease-in-out infinite',
+        'fade-in': 'fade-in 0.3s ease-out both',
+        sway: 'sway 5s ease-in-out infinite',
       },
     },
   },
