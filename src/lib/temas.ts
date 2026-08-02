@@ -1,3 +1,4 @@
+import { useSyncExternalStore } from 'react'
 import { supabase, isSupabaseConfigured } from './supabase'
 
 export interface Tema {
@@ -45,9 +46,23 @@ export const TEMAS: Tema[] = [
 
 const STORAGE_KEY = 'ong:tema'
 
-/** Aplica o tema no documento (data-tema) e guarda em cache local. */
+/** Tema em cache local (para aplicar instantaneamente, sem piscar). */
+export function temaEmCache(): string {
+  try {
+    return localStorage.getItem(STORAGE_KEY) ?? TEMA_PADRAO
+  } catch {
+    return TEMA_PADRAO
+  }
+}
+
+// Store reativo: fonte única da verdade do tema aplicado (sobrevive a remontagens).
+let atual = temaEmCache()
+const listeners = new Set<() => void>()
+
+/** Aplica o tema no documento (data-tema), guarda em cache e notifica a UI. */
 export function aplicarTema(id: string) {
   const tema = TEMAS.some((t) => t.id === id) ? id : TEMA_PADRAO
+  atual = tema
   const root = document.documentElement
   if (tema === TEMA_PADRAO) root.removeAttribute('data-tema')
   else root.setAttribute('data-tema', tema)
@@ -56,15 +71,19 @@ export function aplicarTema(id: string) {
   } catch {
     /* ignora storage indisponível */
   }
+  listeners.forEach((fn) => fn())
 }
 
-/** Tema em cache local (para aplicar instantaneamente, sem piscar). */
-export function temaEmCache(): string {
-  try {
-    return localStorage.getItem(STORAGE_KEY) ?? TEMA_PADRAO
-  } catch {
-    return TEMA_PADRAO
-  }
+/** Hook reativo com o tema atualmente aplicado. */
+export function useTemaAtual(): string {
+  return useSyncExternalStore(
+    (fn) => {
+      listeners.add(fn)
+      return () => listeners.delete(fn)
+    },
+    () => atual,
+    () => TEMA_PADRAO,
+  )
 }
 
 /** Busca o tema global salvo no Supabase (o que o admin aplicou para todos). */

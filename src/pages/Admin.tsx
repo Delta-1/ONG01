@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
 import { getMetricasAdmin } from '../lib/metricas'
-import { TEMAS, aplicarTema, temaEmCache, carregarTemaGlobal, salvarTemaGlobal } from '../lib/temas'
+import { TEMAS, aplicarTema, useTemaAtual, temaEmCache, carregarTemaGlobal, salvarTemaGlobal } from '../lib/temas'
 import {
   ESTRUTURAS,
   useEstrutura,
@@ -369,16 +369,12 @@ function ConfiguracaoEstrutura() {
   const [salvo, setSalvo] = useState<string>(atual)
   const [salvando, setSalvando] = useState(false)
   const [msg, setMsg] = useState<{ tipo: 'ok' | 'erro'; texto: string } | null>(null)
-  const salvoRef = useRef(salvo)
 
   useEffect(() => {
-    carregarEstruturaGlobal().then((e) => {
-      setSalvo(e)
-      salvoRef.current = e
-      definirEstrutura(e)
-    })
-    // Ao sair da tela sem salvar, restaura a estrutura global (desfaz o preview).
-    return () => definirEstrutura(salvoRef.current)
+    // Apenas carrega qual é a estrutura salva (para o selo "ATIVO" e o botão).
+    // Não reaplica aqui: o App já aplicou o global no carregamento, e o preview
+    // vive no store (sobrevive à remontagem do Layout ao trocar de estrutura).
+    carregarEstruturaGlobal().then(setSalvo)
   }, [])
 
   async function aplicarParaTodos() {
@@ -391,7 +387,6 @@ function ConfiguracaoEstrutura() {
       return
     }
     setSalvo(atual)
-    salvoRef.current = atual
     setMsg({ tipo: 'ok', texto: 'Estrutura aplicada para todos os usuários! 🎉' })
   }
 
@@ -458,7 +453,7 @@ function ConfiguracaoEstrutura() {
       {mudou && (
         <p className="mt-4 text-xs text-forest-400">
           👀 Pré-visualizando <span className="font-600">{ESTRUTURAS.find((e) => e.id === atual)?.nome}</span>.
-          Clique em <span className="font-600">“Aplicar para todos”</span> para salvar, ou saia da página para descartar.
+          Clique em <span className="font-600">“Aplicar para todos”</span> para salvar (recarregar a página volta ao salvo).
         </p>
       )}
     </div>
@@ -471,24 +466,18 @@ function ConfiguracaoEstrutura() {
  * no início de cada visita.
  */
 function ConfiguracoesSite() {
-  const [selecionado, setSelecionado] = useState<string>(temaEmCache())
+  const selecionado = useTemaAtual()
   const [salvo, setSalvo] = useState<string>(temaEmCache())
   const [salvando, setSalvando] = useState(false)
   const [msg, setMsg] = useState<{ tipo: 'ok' | 'erro'; texto: string } | null>(null)
-  const salvoRef = useRef(salvo)
 
   useEffect(() => {
-    carregarTemaGlobal().then((t) => {
-      setSalvo(t)
-      setSelecionado(t)
-      salvoRef.current = t
-    })
-    // Ao sair da tela sem salvar, restaura o tema global (desfaz o preview).
-    return () => aplicarTema(salvoRef.current)
+    // Só carrega qual é o tema salvo (para o selo "ATIVO" e o botão). O preview
+    // vive no store reativo e sobrevive à remontagem do Layout.
+    carregarTemaGlobal().then(setSalvo)
   }, [])
 
   function preview(id: string) {
-    setSelecionado(id)
     aplicarTema(id)
     setMsg(null)
   }
@@ -503,7 +492,6 @@ function ConfiguracoesSite() {
       return
     }
     setSalvo(selecionado)
-    salvoRef.current = selecionado
     setMsg({ tipo: 'ok', texto: 'Tema aplicado para todos os usuários! 🎉' })
   }
 
@@ -581,7 +569,7 @@ function ConfiguracoesSite() {
       {mudou && (
         <p className="mt-4 text-xs text-forest-400">
           👀 Você está pré-visualizando <span className="font-600">{TEMAS.find((t) => t.id === selecionado)?.nome}</span>.
-          Clique em <span className="font-600">“Aplicar para todos”</span> para salvar, ou saia da página para descartar.
+          Clique em <span className="font-600">“Aplicar para todos”</span> para salvar (recarregar a página volta ao salvo).
         </p>
       )}
     </div>
