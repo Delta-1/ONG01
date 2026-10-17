@@ -43,3 +43,13 @@ Detalhes de autenticação: [docs/configuracao-auth.md](docs/configuracao-auth.m
 `npm run build` verifica TypeScript e gera o pacote de produção. `tests/publications-rls.sql` valida permissões, vínculo, isolamento, moderação, curtidas e exclusão de demonstrações. Execute em um ambiente Supabase configurado: o teste cria registros temporários em uma transação e usa `ROLLBACK`.
 
 Avisos de publicação são internos ao painel. Convites e recuperação usam o serviço de e-mail do Supabase e devem ser testados com destinatário autorizado após configurar SMTP. Não há promessa de envio de e-mail de aprovação.
+
+## Formulário rápido da equipe
+
+Compartilhe `https://ong-brasil.vercel.app/formulario`. Não exige conta e permite cadastrar várias empresas. Cada envio fica privado em **Admin → Cadastros do formulário rápido**. Ao aprovar, a transação cria o empreendimento e uma primeira apresentação com a história informada. A administração organiza o acesso da empresa depois, em **Empreendimentos e acessos**. Rejeições exigem justificativa e ficam registradas para a equipe.
+
+Em **Admin → Administradores**, um administrador informa o e-mail de uma conta já cadastrada para promover essa pessoa. Cadastros comuns continuam com perfil de empresa; a promoção exige autorização verificada no banco e gera registro de auditoria. O novo administrador atualiza a página ou entra novamente.
+
+A migração `20261017131138_quick_intake_and_admin_access.sql` cria a fila privada, as operações de aprovação e as operações administrativas. Publique também a Edge Function `cadastro-rapido`, mantendo a verificação JWT habilitada: o cliente público usa a chave anon, sem precisar de conta. Somente o servidor pode receber os envios no banco. Há limite de 60 envios por hora por identificação de rede com hash, proteção de repetição por UUID e campo antispam. As tabelas privadas de auditoria e limite usam RLS sem políticas de cliente por intenção.
+
+`tests/quick-intake-admin.sql` verifica isolamento, aprovação exclusiva por administradores, promoção por e-mail, idempotência e limite de envios dentro de uma transação revertida.
