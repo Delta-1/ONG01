@@ -23,6 +23,7 @@ const Admin = lazy(() => import("./pages/Admin"));
 const Publicar = lazy(() => import("./pages/Publicar"));
 const RecuperarSenha = lazy(() => import("./pages/RecuperarSenha"));
 const RedefinirSenha = lazy(() => import("./pages/RedefinirSenha"));
+const FormularioRapido = lazy(() => import("./pages/FormularioRapido"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 export default function App() {
@@ -55,6 +56,8 @@ export default function App() {
             <Route path="/noticias" element={<Noticias />} />
             <Route path="/legislacao" element={<Legislacao />} />
             <Route path="/sobre" element={<Sobre />} />
+            <Route path="/formulario" element={<FormularioRapido />} />
+            <Route path="/cadastro-rapido" element={<FormularioRapido />} />
             <Route path="/cadastro" element={<Cadastro />} />
             <Route path="/entrar" element={<Login />} />
             <Route path="/publicar" element={<Publicar />} />

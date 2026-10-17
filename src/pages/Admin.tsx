@@ -13,6 +13,8 @@ import PublicacaoCard from "../components/PublicacaoCard";
 import AcessoEmpresa from "../components/AcessoEmpresa";
 import AparenciaAdmin from "../components/AparenciaAdmin";
 import { Message, TextField } from "../components/FormUI";
+import CadastrosRapidosAdmin from "../components/CadastrosRapidosAdmin";
+import Administradores from "../components/Administradores";
 export default function Admin() {
   const auth = useAuth(),
     [tab, setTab] = useState<
@@ -119,6 +121,7 @@ export default function Admin() {
           Criar conta, entrar, clicar em Publicar e enviar o formulário.
         </p>
       </div>
+      <CadastrosRapidosAdmin onApproved={state.refresh} />
       <div className="my-6 flex flex-wrap gap-2">
         {(
           [
@@ -271,6 +274,7 @@ export default function Admin() {
             ))}
         </div>
       )}
+      <Administradores />
       <AparenciaAdmin />
     </div>
   );
