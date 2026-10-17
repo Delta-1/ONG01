@@ -1,63 +1,39 @@
-# Configuração de Autenticação — Supabase (ONG01)
+# Acesso ao Observatório
 
-Estas configurações ficam **no painel do Supabase** (não estão no código). Este
-documento registra os valores exatos para não se perder. Projeto: **ONG01**
-(`rzsmvlfmjjujbipghmsl`). Site em produção: **https://ong-brasil.vercel.app**
+Projeto Supabase: ONG01 (`rzsmvlfmjjujbipghmsl`).
+Site atual: https://ong-brasil.vercel.app
 
-## 1. Confirmação de e-mail — DESLIGADA (decisão do produto)
+## URLs
 
-Para reduzir a burocracia, o cadastro **não exige confirmação de e-mail**. O fluxo
-tem 2 passos: criar conta → publicar o empreendimento (fica pendente de curadoria).
+Em Authentication > URL Configuration:
 
-**Authentication → Providers → Email**
-- Deixe **"Confirm email"** DESATIVADO.
+- Site URL: `https://ong-brasil.vercel.app`
+- Redirect URLs: `https://ong-brasil.vercel.app/**`
+- Desenvolvimento: `http://127.0.0.1:5173/**` e `http://localhost:5173/**`
+- Se o GitHub Pages for usado: `https://delta-1.github.io/ONG01/**`
 
-Com isso, o `signUp()` já cria a sessão na hora e o usuário segue direto para
-publicar. A política de RLS de insert é pública (ver `supabase/migrations/`), então
-a publicação funciona mesmo que a confirmação esteja ligada — mas o recomendado,
-conforme a decisão, é mantê-la desligada.
+Convites e recuperação retornam para `/redefinir-senha`. Essa tela permite escolher uma senha nova, incluindo no primeiro acesso por convite. O painel também oferece troca de senha para contas autenticadas.
 
-> Se um dia quiser reativar a confirmação (mais segurança contra spam), reative
-> "Confirm email" aqui e me avise para eu religar a tela de espera no cadastro.
+## Cadastro e papéis
 
-## 2. URLs de redirecionamento
+A confirmação de e-mail pode ser ativada ou desativada no Supabase. O cadastro trata ambas as situações: entra no painel quando recebe sessão, ou orienta confirmar o e-mail antes de entrar. A política pública que permitia cadastrar negócios sem autenticação foi removida.
 
-**Authentication → URL Configuration**
-- **Site URL:** `https://ong-brasil.vercel.app`
-- **Redirect URLs** (adicionar):
-  - `https://ong-brasil.vercel.app/**`
-  - `http://localhost:5173/**` (desenvolvimento local com Vite)
+A criação de perfil sempre atribui `empresa`. Um usuário não pode alterar o próprio papel nem o vínculo pelo navegador. Administrações existentes são preservadas. A criação de novos administradores exige uma operação confiável no servidor/banco.
 
-Sem isso, o link do e-mail não retorna corretamente para o site.
+## Convites e senhas
 
-## 3. Template do e-mail de confirmação (personalizado)
+O administrador pode criar inicialmente o negócio e a publicação, sem depender de uma conta de empreendedor. Depois, em Empreendimentos e acessos, informa o e-mail real e escolhe convite ou senha provisória. E-mails de login ficam no Auth, consultados apenas pela função administrativa. Contatos públicos informados no formulário são independentes.
 
-**Authentication → Email Templates → "Confirm signup"**
-- **Assunto:** `Confirme seu cadastro no Observatório Acriano 🌱`
-- **Corpo:** cole o conteúdo de [`supabase/templates/confirm-signup.html`](../supabase/templates/confirm-signup.html).
+Uma conta já vinculada a outro negócio ou uma conta administrativa não pode ser vinculada automaticamente. Senhas existentes não são armazenadas em texto nem retornadas. Uma nova senha provisória é exibida uma única vez ao administrador, que deve entregá-la ao responsável.
 
-O template é em português, com a marca do Observatório e **não menciona o Supabase**.
+## E-mails
 
-## 4. Remetente (para o e-mail não parecer "do Supabase")
+Configure SMTP próprio em Authentication para entrega externa confiável. O serviço padrão do Supabase tem limites e restrições. O aplicativo informa falhas de envio e permite solicitar novamente.
 
-Por padrão, o Supabase envia de `noreply@mail.app.supabase.io` — esse endereço é o
-que revela o Supabase, e o envio padrão é limitado (poucos e-mails por hora, serve
-só para testes). Para o e-mail sair em nome do Observatório, configure **SMTP
-próprio**:
+Avisos de recebimento, aprovação e solicitação de ajustes ficam em `avisos` e aparecem no painel da empresa. Nenhum e-mail de aprovação é prometido nesta versão.
 
-**Authentication → SMTP Settings → Enable Custom SMTP**
-- **Sender name:** `Observatório Acriano`
-- **Sender email:** o e-mail do seu domínio/provedor (ex.: `contato@seudominio.com`)
-- **Host / Port / User / Senha:** fornecidos pelo provedor de e-mail.
+## Imagens e curtidas
 
-Provedores recomendados (têm plano gratuito):
-- **Resend** — `smtp.resend.com`, porta `465`, usuário `resend`, senha = API key.
-- **Brevo (ex-Sendinblue)** — `smtp-relay.brevo.com`, porta `587`.
+Fotos ficam no bucket privado `publicacoes`, com limite de 5 MB e formatos JPEG, PNG e WebP. Antes da aprovação, somente remetente e administrador podem acessá-las. Após a aprovação, os visitantes recebem URLs de curta duração.
 
-> Enquanto o SMTP próprio não estiver configurado, o corpo do e-mail já estará
-> personalizado, mas o **remetente** continuará sendo um endereço do Supabase.
-
-## Políticas de RLS
-
-As políticas do banco estão versionadas em
-[`supabase/migrations/`](../supabase/migrations/).
+Curtidas de posts exigem login. Cada conta tem uma curtida por publicação e só pode remover a própria. A contagem pública não expõe a lista de usuários.

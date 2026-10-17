@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom'
-import { SectionTitle } from '../components/ui'
+import { Link } from "react-router-dom";
+import { SectionTitle } from "../components/ui";
 
 export default function Sobre() {
   return (
@@ -13,16 +13,16 @@ export default function Sobre() {
       <div className="mt-10 grid gap-6 md:grid-cols-3">
         {[
           {
-            t: 'Portal institucional',
-            d: 'Notícias, legislação e princípios de defesa da sociobiodiversidade e da bioeconomia.',
+            t: "Portal institucional",
+            d: "Notícias, legislação e princípios de defesa da sociobiodiversidade e da bioeconomia.",
           },
           {
-            t: 'Dashboard público',
-            d: 'Um painel de dados feito sob medida, com mapa interativo do Acre e indicadores por município — sem depender de ferramentas engessadas.',
+            t: "Dashboard público",
+            d: "Um painel de dados feito sob medida, com mapa interativo do Acre e indicadores por município — sem depender de ferramentas engessadas.",
           },
           {
-            t: 'Vitrine de empreendimentos',
-            d: 'Cada negócio da floresta pode se cadastrar, contar sua história e divulgar seus produtos (sem venda direta).',
+            t: "Vitrine de empreendimentos",
+            d: "Cada negócio da floresta pode se cadastrar, contar sua história e divulgar seus produtos (sem venda direta).",
           },
         ].map((c) => (
           <div key={c.t} className="card p-6">
@@ -33,13 +33,15 @@ export default function Sobre() {
       </div>
 
       <div className="mt-10 card p-8">
-        <h2 className="font-display text-xl font-700 text-forest-800">Como funciona a participação</h2>
+        <h2 className="font-display text-xl font-700 text-forest-800">
+          Como funciona a participação
+        </h2>
         <ol className="mt-5 space-y-4">
           {[
-            'O empreendedor cria sua conta e preenche o formulário de apresentação do negócio.',
-            'A equipe administradora revisa e aprova (ou recusa) o cadastro.',
-            'Aprovado, o empreendedor ganha um painel para criar e editar sua própria página.',
-            'A página é publicada na vitrine e qualquer visitante pode conhecê-la.',
+            "O empreendedor cria sua conta e preenche o formulário de apresentação do negócio.",
+            "A conta dá acesso ao painel do empreendedor e ao botão Publicar.",
+            "O empreendedor clica em Publicar, preenche o formulário e envia o conteúdo para análise.",
+            "Após a aprovação da equipe, a publicação aparece no perfil público e a empresa recebe um aviso no painel.",
           ].map((passo, i) => (
             <li key={i} className="flex gap-4">
               <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-forest-600 font-display text-sm font-700 text-white">
@@ -60,10 +62,9 @@ export default function Sobre() {
       </div>
 
       <p className="mt-8 rounded-xl border border-dashed border-forest-200 bg-forest-50 p-4 text-sm text-forest-500">
-        <strong>Nota do protótipo:</strong> escopo geográfico atual é apenas o Acre (estrutura
-        pronta para expandir). O nome oficial do projeto ainda está em confirmação. Dados exibidos
-        são fictícios, para desenvolvimento.
+        A coleta abrange os 22 municípios do Acre. Os perfis e as publicações
+        passam pela curadoria antes de aparecerem na vitrine pública.
       </p>
     </div>
-  )
+  );
 }

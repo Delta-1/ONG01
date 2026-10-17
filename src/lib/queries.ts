@@ -1,92 +1,146 @@
-import { supabase, isSupabaseConfigured } from './supabase'
-import { MUNICIPIOS } from '../data/municipios'
-import { EMPREENDIMENTOS, NOTICIAS, LEGISLACAO } from '../data/conteudo'
-import type { Municipio, Empreendimento, Noticia, Legislacao } from '../data/types'
+import { supabase } from "./supabase";
+import { MUNICIPIOS } from "../data/municipios";
+import type {
+  Municipio,
+  Empreendimento,
+  Noticia,
+  Legislacao,
+  Publicacao,
+  Aviso,
+} from "../data/types";
 
-/**
- * Camada de acesso a dados do Observatório.
- *
- * O banco Supabase já está criado e populado (tabelas: municipios,
- * indicadores_municipio, empreendimentos, noticias, legislacao — todas com
- * RLS de leitura pública). Estas funções leem do Supabase quando ele está
- * configurado; caso contrário, usam os dados locais (que espelham o banco),
- * garantindo que o site nunca quebre.
- *
- * Para tornar o site 100% "ao vivo", basta trocar os imports dos dados locais
- * pelos hooks/consultas abaixo nas páginas.
- */
-
-export async function fetchMunicipios(): Promise<Municipio[]> {
-  if (!isSupabaseConfigured || !supabase) return MUNICIPIOS
-  const { data, error } = await supabase
-    .from('municipios')
-    .select('codigo,nome,regiao,indicadores_municipio(empreendimentos,familias,producao_ton,faturamento_mil,area_manejada_ha,produtos)')
-  if (error || !data) return MUNICIPIOS
-  return data.map((m: Record<string, unknown>) => {
-    const ind = (m.indicadores_municipio as Record<string, unknown>[] | null)?.[0]
-    return {
-      codigo: m.codigo as string,
-      nome: m.nome as string,
-      regiao: m.regiao as Municipio['regiao'],
-      indicadores: {
-        empreendimentos: Number(ind?.empreendimentos ?? 0),
-        familias: Number(ind?.familias ?? 0),
-        producaoTon: Number(ind?.producao_ton ?? 0),
-        faturamentoMil: Number(ind?.faturamento_mil ?? 0),
-        areaManejadaHa: Number(ind?.area_manejada_ha ?? 0),
-        produtos: (ind?.produtos as string[]) ?? [],
-      },
-    }
-  })
+export function db() {
+  if (!supabase)
+    throw new Error("O serviço está indisponível. Tente novamente mais tarde.");
+  return supabase;
 }
-
-export async function fetchEmpreendimentos(): Promise<Empreendimento[]> {
-  if (!isSupabaseConfigured || !supabase) return EMPREENDIMENTOS
-  const { data, error } = await supabase
-    .from('empreendimentos')
-    .select('*')
-    .eq('aprovado', true)
-  if (error || !data) return EMPREENDIMENTOS
-  return data.map((e: Record<string, unknown>) => ({
-    id: e.id as string,
-    nome: e.nome as string,
-    municipioCodigo: e.municipio_codigo as string,
-    categoria: e.categoria as string,
-    historia: e.historia as string,
+export function mapEmpresa(e: Record<string, unknown>): Empreendimento {
+  return {
+    id: String(e.id),
+    nome: String(e.nome),
+    municipioCodigo: String(e.municipio_codigo ?? ""),
+    categoria: String(e.categoria ?? ""),
+    historia: String(e.historia ?? ""),
     produtos: (e.produtos as string[]) ?? [],
     contato: {
-      telefone: (e.telefone as string) ?? '',
-      email: (e.email as string) ?? '',
-      instagram: (e.instagram as string) ?? undefined,
+      telefone: String(e.telefone ?? ""),
+      email: String(e.email ?? ""),
+      instagram: String(e.instagram ?? ""),
     },
-    destaque: Boolean(e.destaque),
     aprovado: Boolean(e.aprovado),
-    cor: (e.cor as string) ?? '#256b3d',
-  }))
+    destaque: Boolean(e.destaque),
+    cor: String(e.cor ?? "#256b3d"),
+    comunidade: String(e.comunidade ?? ""),
+    responsavel: String(e.responsavel ?? ""),
+    tipo: String(e.tipo ?? ""),
+    owner_id: e.owner_id as string | null,
+    is_demo: Boolean(e.is_demo),
+  };
 }
-
+export async function fetchEmpreendimentos(): Promise<Empreendimento[]> {
+  const { data, error } = await db()
+    .from("empreendimentos")
+    .select("*")
+    .eq("is_demo", false)
+    .eq("aprovado", true)
+    .order("nome");
+  if (error) throw error;
+  return (data ?? []).map(mapEmpresa);
+}
+export async function fetchMunicipios(): Promise<Municipio[]> {
+  const empresas = await fetchEmpreendimentos();
+  return MUNICIPIOS.map((m) => ({
+    ...m,
+    indicadores: {
+      ...m.indicadores,
+      empreendimentos: empresas.filter((e) => e.municipioCodigo === m.codigo)
+        .length,
+      produtos: [
+        ...new Set(
+          empresas
+            .filter((e) => e.municipioCodigo === m.codigo)
+            .flatMap((e) => e.produtos),
+        ),
+      ],
+    },
+  }));
+}
 export async function fetchNoticias(): Promise<Noticia[]> {
-  if (!isSupabaseConfigured || !supabase) return NOTICIAS
-  const { data, error } = await supabase.from('noticias').select('*').order('data', { ascending: false })
-  if (error || !data) return NOTICIAS
-  return data.map((n: Record<string, unknown>) => ({
-    id: n.id as string,
-    titulo: n.titulo as string,
-    resumo: n.resumo as string,
-    data: n.data as string,
-    categoria: n.categoria as string,
-  }))
+  const { data, error } = await db()
+    .from("noticias")
+    .select("*")
+    .eq("is_demo", false)
+    .order("data", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as Noticia[];
 }
-
 export async function fetchLegislacao(): Promise<Legislacao[]> {
-  if (!isSupabaseConfigured || !supabase) return LEGISLACAO
-  const { data, error } = await supabase.from('legislacao').select('*').order('ano', { ascending: false })
-  if (error || !data) return LEGISLACAO
-  return data.map((l: Record<string, unknown>) => ({
-    id: l.id as string,
-    titulo: l.titulo as string,
-    descricao: l.descricao as string,
-    esfera: l.esfera as Legislacao['esfera'],
-    ano: Number(l.ano),
-  }))
+  const { data, error } = await db()
+    .from("legislacao")
+    .select("*")
+    .eq("is_demo", false)
+    .order("ano", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as Legislacao[];
+}
+export async function fetchMinhaEmpresa(userId: string) {
+  const { data, error } = await db()
+    .from("empreendimentos")
+    .select("*")
+    .eq("owner_id", userId)
+    .eq("is_demo", false)
+    .maybeSingle();
+  if (error) throw error;
+  return data ? mapEmpresa(data) : null;
+}
+export async function fetchEmpresasAdmin() {
+  const { data, error } = await db()
+    .from("empreendimentos")
+    .select("*")
+    .eq("is_demo", false)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []).map(mapEmpresa);
+}
+export async function fetchPublicacoes(
+  empresaId?: string,
+): Promise<Publicacao[]> {
+  let query = db()
+    .from("publicacoes")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (empresaId) query = query.eq("empreendimento_id", empresaId);
+  const { data, error } = await query;
+  if (error) throw error;
+  return Promise.all(
+    ((data ?? []) as Publicacao[]).map(async (p) => {
+      if (!p.imagem_path) return p;
+      const { data: img, error: imgError } = await db()
+        .storage.from("publicacoes")
+        .createSignedUrl(p.imagem_path, 900);
+      if (imgError) return p;
+      return { ...p, imagem_url: img?.signedUrl };
+    }),
+  );
+}
+export async function fetchAvisos(empresaId: string): Promise<Aviso[]> {
+  const { data, error } = await db()
+    .from("avisos")
+    .select("*")
+    .eq("empreendimento_id", empresaId)
+    .order("created_at", { ascending: false })
+    .limit(20);
+  if (error) throw error;
+  return (data ?? []) as Aviso[];
+}
+export function mensagemErro(error: unknown) {
+  const message =
+    error instanceof Error
+      ? error.message
+      : (error as { message?: string })?.message;
+  if (message?.includes("Failed to fetch"))
+    return "Não foi possível conectar. Verifique sua internet e tente novamente.";
+  if (message?.includes("JWT") || message?.includes("session"))
+    return "Sua sessão expirou. Entre novamente.";
+  return message || "Não foi possível concluir a operação. Tente novamente.";
 }
