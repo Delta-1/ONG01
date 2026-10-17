@@ -53,3 +53,11 @@ Em **Admin → Administradores**, um administrador informa o e-mail de uma conta
 A migração `20261017131138_quick_intake_and_admin_access.sql` cria a fila privada, as operações de aprovação e as operações administrativas. Publique também a Edge Function `cadastro-rapido`, mantendo a verificação JWT habilitada: o cliente público usa a chave anon, sem precisar de conta. Somente o servidor pode receber os envios no banco. Há limite de 60 envios por hora por identificação de rede com hash, proteção de repetição por UUID e campo antispam. As tabelas privadas de auditoria e limite usam RLS sem políticas de cliente por intenção.
 
 `tests/quick-intake-admin.sql` verifica isolamento, aprovação exclusiva por administradores, promoção por e-mail, idempotência e limite de envios dentro de uma transação revertida.
+
+## Exportação e organização da base
+
+Em `/admin`, **Exportar todos os empreendimentos (.csv)** baixa uma planilha compatível com Excel e Google Planilhas. Inclui todos os empreendimentos reais, os envios do formulário rápido ainda não convertidos e o status de cada registro, sem duplicar os formulários já aprovados. Traz município, região, categoria, contatos públicos, história, produtos e contagem de publicações. Não contém e-mail privado de login, senhas ou identificadores de acesso. Os filtros da tela não limitam a exportação. Dados de demonstração ficam excluídos.
+
+A aba **Empreendimentos e acessos** permite buscar por nome, categoria, comunidade ou responsável e filtrar por município. Use **Publicar por uma empresa** ou **Criar publicação** no cadastro da empresa; o envio passa pela análise e precisa de aprovação. Os perfis aprovados e suas publicações aprovadas são públicos em `/vitrine`; o dashboard público em `/observatorio` conta os perfis aprovados por município e região.
+
+A leitura de empreendimentos e da exportação percorre todas as páginas da API. O CSV usa UTF-8 com BOM, separador `;` e neutraliza conteúdo que poderia ser interpretado como fórmula por uma planilha. `tests/export-empresas.test.ts` verifica essas propriedades e a paginação com mais de mil registros.

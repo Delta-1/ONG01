@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { readAllPages } from "./pagination";
 import { MUNICIPIOS } from "../data/municipios";
 import type {
   Municipio,
@@ -38,14 +39,17 @@ export function mapEmpresa(e: Record<string, unknown>): Empreendimento {
   };
 }
 export async function fetchEmpreendimentos(): Promise<Empreendimento[]> {
-  const { data, error } = await db()
-    .from("empreendimentos")
-    .select("*")
-    .eq("is_demo", false)
-    .eq("aprovado", true)
-    .order("nome");
-  if (error) throw error;
-  return (data ?? []).map(mapEmpresa);
+  const data = await readAllPages((from, to) =>
+    db()
+      .from("empreendimentos")
+      .select("*")
+      .eq("is_demo", false)
+      .eq("aprovado", true)
+      .order("nome")
+      .order("id")
+      .range(from, to),
+  );
+  return data.map(mapEmpresa);
 }
 export async function fetchMunicipios(): Promise<Municipio[]> {
   const empresas = await fetchEmpreendimentos();
@@ -94,13 +98,16 @@ export async function fetchMinhaEmpresa(userId: string) {
   return data ? mapEmpresa(data) : null;
 }
 export async function fetchEmpresasAdmin() {
-  const { data, error } = await db()
-    .from("empreendimentos")
-    .select("*")
-    .eq("is_demo", false)
-    .order("created_at", { ascending: false });
-  if (error) throw error;
-  return (data ?? []).map(mapEmpresa);
+  const data = await readAllPages((from, to) =>
+    db()
+      .from("empreendimentos")
+      .select("*")
+      .eq("is_demo", false)
+      .order("created_at", { ascending: false })
+      .order("id")
+      .range(from, to),
+  );
+  return data.map(mapEmpresa);
 }
 export async function fetchPublicacoes(
   empresaId?: string,
