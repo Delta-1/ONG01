@@ -15,6 +15,7 @@ import AparenciaAdmin from "../components/AparenciaAdmin";
 import { Message, TextField } from "../components/FormUI";
 import CadastrosRapidosAdmin from "../components/CadastrosRapidosAdmin";
 import Administradores from "../components/Administradores";
+import { carregarPlanilhaEmpresas } from "../lib/exportEmpresas";
 export default function Admin() {
   const auth = useAuth(),
     [tab, setTab] = useState<
@@ -24,7 +25,11 @@ export default function Admin() {
     [review, setReview] = useState(""),
     [busy, setBusy] = useState(""),
     [error, setError] = useState(""),
-    [message, setMessage] = useState("");
+    [message, setMessage] = useState(""),
+    [exporting, setExporting] = useState(false),
+    [empresaPublicacao, setEmpresaPublicacao] = useState(""),
+    [search, setSearch] = useState(""),
+    [municipio, setMunicipio] = useState("");
   const state = useLoad(async () => {
     if (!auth.isAdmin) return null;
     const [empresas, posts] = await Promise.all([
@@ -33,6 +38,31 @@ export default function Admin() {
     ]);
     return { empresas, posts };
   }, `${auth.user?.id}:${auth.isAdmin}`);
+  async function exportar() {
+    setExporting(true);
+    setError("");
+    setMessage("");
+    try {
+      const { csv, total } = await carregarPlanilhaEmpresas();
+      const url = URL.createObjectURL(
+        new Blob([csv], { type: "text/csv;charset=utf-8" }),
+      );
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `empreendimentos-acre-${new Intl.DateTimeFormat("sv-SE", { timeZone: "America/Sao_Paulo" }).format(new Date())}.csv`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setMessage(
+        `Planilha exportada: ${total} registro(s), incluindo cadastros em análise. Os filtros da tela não limitam a exportação.`,
+      );
+    } catch (e) {
+      setError(mensagemErro(e));
+    } finally {
+      setExporting(false);
+    }
+  }
   async function revisar(id: string, aprovar: boolean) {
     setBusy(id);
     setError("");
@@ -71,6 +101,19 @@ export default function Admin() {
   const empresas = state.data?.empresas ?? [],
     posts = state.data?.posts ?? [],
     byId = Object.fromEntries(empresas.map((e) => [e.id, e]));
+  const normalize = (value: string) =>
+    value
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLocaleLowerCase("pt-BR");
+  const empresasFiltradas = empresas.filter(
+    (e) =>
+      (!municipio || e.municipioCodigo === municipio) &&
+      normalize(
+        [e.nome, e.categoria, e.comunidade, e.responsavel].join(" "),
+      ).includes(normalize(search.trim())),
+  );
+
   return (
     <div className="container-page py-10">
       <div className="flex flex-wrap items-start justify-between gap-5">
@@ -84,9 +127,20 @@ export default function Admin() {
             empresas.
           </p>
         </div>
-        <Link className="btn-primary" to="/admin/novo">
-          + Criar cadastro de empreendimento
-        </Link>
+        <div className="flex flex-wrap gap-3">
+          <button
+            className="btn-ghost"
+            disabled={exporting}
+            onClick={() => void exportar()}
+          >
+            {exporting
+              ? "Preparando planilha…"
+              : "Exportar todos os empreendimentos (.csv)"}
+          </button>
+          <Link className="btn-primary" to="/admin/novo">
+            + Criar cadastro de empreendimento
+          </Link>
+        </div>
       </div>
       <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-3">
         {[
@@ -121,6 +175,45 @@ export default function Admin() {
           Criar conta, entrar, clicar em Publicar e enviar o formulário.
         </p>
       </div>
+      <section className="card mt-6 space-y-4 p-5">
+        <h2 className="font-display text-xl font-semibold">
+          Publicar por uma empresa
+        </h2>
+        <p className="text-sm text-forest-600">
+          Escolha um empreendimento para criar uma publicação em nome dele.
+          Depois do envio, aprove em Em análise para divulgar o conteúdo. O
+          perfil aprovado entra na vitrine e nos totais do dashboard público.
+        </p>
+        <label className="block text-sm font-semibold">
+          Empresa da publicação
+          <select
+            className="mt-2 w-full rounded-lg border border-forest-200 p-3"
+            value={empresaPublicacao}
+            onChange={(e) => setEmpresaPublicacao(e.target.value)}
+          >
+            <option value="">Selecione um empreendimento</option>
+            {[...empresas]
+              .sort((a, b) => a.nome.localeCompare(b.nome))
+              .map((e) => (
+                <option key={e.id} value={e.id}>
+                  {e.nome} —{" "}
+                  {MUNICIPIOS.find((m) => m.codigo === e.municipioCodigo)?.nome}
+                </option>
+              ))}
+          </select>
+        </label>
+        {empresaPublicacao && (
+          <Link
+            className="btn-primary"
+            to={`/publicar?empresa=${encodeURIComponent(empresaPublicacao)}`}
+          >
+            Criar publicação para esta empresa
+          </Link>
+        )}
+        <Link className="inline-block text-sm underline" to="/observatorio">
+          Ver dashboard público
+        </Link>
+      </section>
       <CadastrosRapidosAdmin onApproved={state.refresh} />
       <div className="my-6 flex flex-wrap gap-2">
         {(
@@ -158,7 +251,42 @@ export default function Admin() {
               empreendimento ou compartilhe o link.
             </Message>
           )}
-          {empresas.map((e) => (
+          <div className="card grid gap-4 p-5 sm:grid-cols-2">
+            <label className="text-sm font-semibold">
+              Buscar empreendimento
+              <input
+                className="mt-2 w-full rounded-lg border border-forest-200 p-3"
+                placeholder="Nome, categoria, comunidade ou responsável"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </label>
+            <label className="text-sm font-semibold">
+              Filtrar por município
+              <select
+                className="mt-2 w-full rounded-lg border border-forest-200 p-3"
+                value={municipio}
+                onChange={(e) => setMunicipio(e.target.value)}
+              >
+                <option value="">Todos os municípios</option>
+                {[...MUNICIPIOS]
+                  .sort((a, b) => a.nome.localeCompare(b.nome))
+                  .map((m) => (
+                    <option key={m.codigo} value={m.codigo}>
+                      {m.nome}
+                    </option>
+                  ))}
+              </select>
+            </label>
+            <p className="text-sm text-forest-500 sm:col-span-2">
+              {empresasFiltradas.length} de {empresas.length} empreendimento(s).
+              A exportação inclui todos, independentemente destes filtros.
+            </p>
+          </div>
+          {empresas.length > 0 && !empresasFiltradas.length && (
+            <Message>Nenhum empreendimento corresponde aos filtros.</Message>
+          )}
+          {empresasFiltradas.map((e) => (
             <article className="card p-6" key={e.id}>
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
@@ -171,6 +299,11 @@ export default function Admin() {
                         ?.nome
                     }{" "}
                     · {e.categoria}
+                  </p>
+                  <p className="mt-2 text-sm font-semibold">
+                    {e.aprovado
+                      ? "Perfil público aprovado"
+                      : "Perfil em análise"}
                   </p>
                   <p className="mt-2 text-sm">
                     {e.responsavel} {e.comunidade && `· ${e.comunidade}`}

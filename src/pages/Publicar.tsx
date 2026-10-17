@@ -186,10 +186,18 @@ export default function Publicar() {
           ← Voltar ao painel
         </Link>
         <span className="eyebrow mt-5 block">
-          {adminNew ? "Cadastro pela administração" : "Sua voz na vitrine"}
+          {adminNew
+            ? "Cadastro pela administração"
+            : auth.isAdmin && existing
+              ? "Publicação pela administração"
+              : "Sua voz na vitrine"}
         </span>
         <h1 className="mt-2 font-display text-3xl text-forest-900">
-          {adminNew ? "Criar empreendimento e publicação" : "Publicar"}
+          {adminNew
+            ? "Criar empreendimento e publicação"
+            : auth.isAdmin && existing
+              ? `Publicar por ${existing.nome}`
+              : "Publicar"}
         </h1>
         <p className="mt-3 text-forest-600">
           Responda com suas palavras. A equipe analisa antes de divulgar. Os
