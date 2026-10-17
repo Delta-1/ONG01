@@ -1,68 +1,45 @@
 # Observatório Acriano da Sócio-bioeconomia
 
-Portal público do Observatório Acriano da Sócio-bioeconomia (nome oficial a confirmar) — um
-site institucional com três frentes integradas:
+Portal do Acre com mapa, vitrine de empreendimentos reais e publicações moderadas.
 
-- **Portal institucional** — notícias e central de legislação da sociobiodiversidade/bioeconomia.
-- **Dashboard público** — mapa **interativo dos 22 municípios do Acre**, com indicadores por
-  cidade (hover mostra os dados, clique abre o detalhamento). Feito sob medida, sem Power BI.
-- **Vitrine de empreendimentos** — showcase estilo "estante/Netflix" dos negócios da floresta,
-  com história, catálogo e contato (sem e-commerce).
+## Fluxo do empreendedor
 
-> ⚠️ **Protótipo em desenvolvimento.** Todos os **dados numéricos são fictícios**, gerados de
-> forma determinística apenas para demonstração. A geometria dos municípios é real (IBGE).
-> A estrutura já está pronta para receber os dados reais via **Supabase**.
+1. Cria conta ou entra em `/entrar`.
+2. No `/painel`, clica em **Publicar**.
+3. Na primeira publicação, informa o negócio, município, categoria, história e contato público. A região vem do município. Depois, informa título, conteúdo e produtos. Foto, processo produtivo e impacto são opcionais.
+4. Envia para análise. Empresa e publicação são gravadas atomicamente e ficam privadas até a curadoria.
+5. A decisão aparece nos avisos do painel. A publicação aprovada aparece em `/vitrine/:id`. Novas publicações também passam pela curadoria.
 
-## Stack
+## Administração
 
-- [Vite](https://vitejs.dev/) + [React 18](https://react.dev/) + TypeScript
-- [Tailwind CSS](https://tailwindcss.com/) (identidade visual orgânica: floresta, rio, terra)
-- [d3-geo](https://github.com/d3/d3-geo) para o mapa coroplético interativo
-- [Recharts](https://recharts.org/) para os gráficos do dashboard
-- [@supabase/supabase-js](https://supabase.com/) (cliente já configurado para a fase de back-end)
+Em `/admin`, o administrador revisa os envios, aprova ou solicita ajustes com uma justificativa. Pode criar um empreendimento e uma primeira publicação em `/admin/novo`, além de enviar outros posts por empresas cadastradas.
 
-## Rodando localmente
+Na aba **Empreendimentos e acessos**, pode consultar/alterar o e-mail privado de login, convidar por e-mail, solicitar recuperação ou gerar uma senha provisória. Senhas já existentes nunca podem ser consultadas. A senha provisória só é exibida na operação de geração.
+
+A área pública usa apenas dados reais validados. Exemplos antigos ficam preservados com `is_demo=true`, fora das consultas públicas. Município e região são dados geográficos. Faturamento, produção, famílias e área não são estimados automaticamente.
+
+## Executar
 
 ```bash
-npm install
-cp .env.example .env   # e preencha a VITE_SUPABASE_ANON_KEY
+npm ci
+cp .env.example .env.local
+# Preencha VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY.
 npm run dev
-```
-
-Abra http://localhost:5173.
-
-## Build de produção
-
-```bash
 npm run build
-npm run preview
 ```
 
-## Variáveis de ambiente
+React 18, TypeScript, Vite, Tailwind, Supabase e mapa D3. A Vercel publica `dist` e resolve rotas via `vercel.json`.
 
-| Variável                 | Descrição                                                        |
-| ------------------------ | ---------------------------------------------------------------- |
-| `VITE_SUPABASE_URL`      | URL do projeto Supabase.                                         |
-| `VITE_SUPABASE_ANON_KEY` | Chave **pública** (anon) do Supabase. Protegida por RLS no back. |
+## Banco e função administrativa
 
-A `anon key` é feita para rodar no navegador. **Nunca** use a `service_role` no front-end.
-No deploy (ex.: Vercel), configure essas variáveis no painel do projeto.
+A migração `supabase/migrations/20261017124018_real_publications_workflow.sql` acrescenta publicações, avisos, curtidas, imagem privada e regras de curadoria. A função `empreendimento-acesso` usa a chave de serviço exclusivamente no servidor, valida o JWT e consulta o perfil administrativo no banco. As chaves de serviço não pertencem ao frontend.
 
-## Estrutura
+Publique `supabase/functions/empreendimento-acesso`. `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` são fornecidas pelo ambiente das Edge Functions. `SITE_URL` é opcional e usa `https://ong-brasil.vercel.app` como padrão. Atualize `SITE_URL`, origens permitidas e URLs do Auth ao trocar o domínio.
 
-```
-public/data/acre-municipios.geojson   # 22 municípios do Acre (IBGE, simplificado)
-src/
-  components/   AcreMap (mapa interativo), Layout, OrganicBg, ui
-  data/         municipios (indicadores fictícios), conteudo (vitrine/notícias/leis), métricas
-  lib/          supabase (cliente), format (helpers pt-BR)
-  pages/        Home, Dashboard, Vitrine, EmpreendimentoDetalhe, Noticias, Legislacao,
-                Sobre, Cadastro, Login, NotFound
-```
+Detalhes de autenticação: [docs/configuracao-auth.md](docs/configuracao-auth.md).
 
-## Próximos passos (roadmap)
+## Verificação
 
-1. Confirmar nome/identidade oficial do projeto.
-2. Substituir os dados fictícios por tabelas no Supabase (municípios, indicadores, empreendimentos).
-3. Autenticação real (empreendedor + administrador) e área ADM de aprovação de cadastros.
-4. Editor de página do empreendedor (mini-blog: história, fotos, catálogo).
+`npm run build` verifica TypeScript e gera o pacote de produção. `tests/publications-rls.sql` valida permissões, vínculo, isolamento, moderação, curtidas e exclusão de demonstrações. Execute em um ambiente Supabase configurado: o teste cria registros temporários em uma transação e usa `ROLLBACK`.
+
+Avisos de publicação são internos ao painel. Convites e recuperação usam o serviço de e-mail do Supabase e devem ser testados com destinatário autorizado após configurar SMTP. Não há promessa de envio de e-mail de aprovação.

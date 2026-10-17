@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from "@supabase/supabase-js";
 
 /**
  * Cliente Supabase do Observatório Acriano.
@@ -8,15 +8,14 @@ import { createClient } from '@supabase/supabase-js'
  * real dos dados é responsabilidade das políticas de RLS (Row Level Security)
  * configuradas no projeto Supabase. NUNCA coloque a `service_role` key aqui.
  *
- * Enquanto o backend/tabelas não estão prontos, o app usa dados fictícios
- * (ver `src/data/`). Assim que as tabelas existirem, troque as fontes de dados
- * dos componentes por consultas a este cliente.
+ * Consultas públicas usam somente registros reais e validados.
+ * Erros e bases vazias não ativam dados de demonstração.
  */
-const url = import.meta.env.VITE_SUPABASE_URL ?? ''
-const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY ?? ''
+const url = import.meta.env.VITE_SUPABASE_URL ?? "";
+const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY ?? "";
 
-export const isSupabaseConfigured = Boolean(url && anonKey)
+export const isSupabaseConfigured = Boolean(url && anonKey);
 
 export const supabase = isSupabaseConfigured
   ? createClient(url, anonKey)
-  : null
+  : null;

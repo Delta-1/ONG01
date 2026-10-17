@@ -1,89 +1,88 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   fetchMunicipios,
   fetchEmpreendimentos,
   fetchNoticias,
   fetchLegislacao,
-} from '../lib/queries'
-import { MUNICIPIOS } from '../data/municipios'
-import { EMPREENDIMENTOS, NOTICIAS, LEGISLACAO } from '../data/conteudo'
-import type { Municipio, Empreendimento, Noticia, Legislacao } from '../data/types'
+  mensagemErro,
+} from "../lib/queries";
+import type { Municipio } from "../data/types";
 
-/**
- * Hooks de dados do Observatório.
- *
- * Cada hook começa com os dados LOCAIS (que espelham o Supabase), para o site
- * nunca aparecer vazio, e faz um "upgrade" para os dados ao vivo do Supabase
- * assim que a consulta responde. Se o Supabase falhar, permanece com o local.
- */
-
+export function useLoad<T>(loader: () => Promise<T>, key = "") {
+  const [data, setData] = useState<T | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [version, setVersion] = useState(0);
+  const refresh = useCallback(() => setVersion((v) => v + 1), []);
+  useEffect(() => {
+    let active = true;
+    setData(null);
+    setLoading(true);
+    setError(null);
+    loader()
+      .then((value) => {
+        if (active) setData(value);
+      })
+      .catch((e) => {
+        if (active) {
+          setError(mensagemErro(e));
+          window.dispatchEvent(
+            new CustomEvent("data-error", { detail: mensagemErro(e) }),
+          );
+        }
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+    // The key explicitly identifies parameters; loader closures need not be memoized.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, version]);
+  return { data, loading, error, refresh };
+}
 export function useMunicipios() {
-  const [municipios, setMunicipios] = useState<Municipio[]>(MUNICIPIOS)
-
-  useEffect(() => {
-    let ativo = true
-    fetchMunicipios().then((d) => ativo && d.length && setMunicipios(d))
-    return () => {
-      ativo = false
-    }
-  }, [])
-
+  const state = useLoad(fetchMunicipios);
+  const municipios = state.data ?? [];
   const byCode = useMemo(
-    () => Object.fromEntries(municipios.map((m) => [m.codigo, m])) as Record<string, Municipio>,
-    [municipios],
-  )
-
-  const totais = useMemo(
     () =>
-      municipios.reduce(
-        (acc, m) => {
-          acc.empreendimentos += m.indicadores.empreendimentos
-          acc.familias += m.indicadores.familias
-          acc.producaoTon += m.indicadores.producaoTon
-          acc.faturamentoMil += m.indicadores.faturamentoMil
-          acc.areaManejadaHa += m.indicadores.areaManejadaHa
-          return acc
-        },
-        { empreendimentos: 0, familias: 0, producaoTon: 0, faturamentoMil: 0, areaManejadaHa: 0 },
-      ),
+      Object.fromEntries(municipios.map((m) => [m.codigo, m])) as Record<
+        string,
+        Municipio
+      >,
     [municipios],
-  )
-
-  return { municipios, byCode, totais }
+  );
+  const totais = municipios.reduce(
+    (a, m) => ({
+      empreendimentos: a.empreendimentos + m.indicadores.empreendimentos,
+      familias: 0,
+      producaoTon: 0,
+      faturamentoMil: 0,
+      areaManejadaHa: 0,
+    }),
+    {
+      empreendimentos: 0,
+      familias: 0,
+      producaoTon: 0,
+      faturamentoMil: 0,
+      areaManejadaHa: 0,
+    },
+  );
+  return {
+    municipios,
+    byCode,
+    totais,
+    loading: state.loading,
+    error: state.error,
+  };
 }
-
 export function useEmpreendimentos() {
-  const [empreendimentos, setEmpreendimentos] = useState<Empreendimento[]>(EMPREENDIMENTOS)
-  useEffect(() => {
-    let ativo = true
-    fetchEmpreendimentos().then((d) => ativo && d.length && setEmpreendimentos(d))
-    return () => {
-      ativo = false
-    }
-  }, [])
-  return empreendimentos
+  return useLoad(fetchEmpreendimentos).data ?? [];
 }
-
 export function useNoticias() {
-  const [noticias, setNoticias] = useState<Noticia[]>(NOTICIAS)
-  useEffect(() => {
-    let ativo = true
-    fetchNoticias().then((d) => ativo && d.length && setNoticias(d))
-    return () => {
-      ativo = false
-    }
-  }, [])
-  return noticias
+  return useLoad(fetchNoticias).data ?? [];
 }
-
 export function useLegislacao() {
-  const [legislacao, setLegislacao] = useState<Legislacao[]>(LEGISLACAO)
-  useEffect(() => {
-    let ativo = true
-    fetchLegislacao().then((d) => ativo && d.length && setLegislacao(d))
-    return () => {
-      ativo = false
-    }
-  }, [])
-  return legislacao
+  return useLoad(fetchLegislacao).data ?? [];
 }

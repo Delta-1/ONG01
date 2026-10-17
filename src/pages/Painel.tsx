@@ -1,218 +1,144 @@
-import { useEffect, useState } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { useEffect } from "react";
+import { Link, Navigate, useSearchParams } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { useLoad } from "../hooks/useData";
 import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
-} from 'recharts'
-import { useAuth } from '../contexts/AuthContext'
-import { useEmpreendimentos } from '../hooks/useData'
-import { getMetricasEmpresa } from '../lib/metricas'
-import { SectionTitle } from '../components/ui'
-import { isSupabaseConfigured } from '../lib/supabase'
-
-interface Metricas {
-  curtidasTotal: number
-  viewsTotal: number
-  curtidasSerie: { dia: string; total: number }[]
-  viewsSerie: { dia: string; total: number }[]
-}
-
-function fmtDia(iso: string) {
-  const d = new Date(iso)
-  return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`
-}
-
-function mergeSeriesPorDia(
-  curtidas: { dia: string; total: number }[],
-  views: { dia: string; total: number }[],
-) {
-  const map: Record<string, { dia: string; curtidas: number; views: number }> = {}
-  curtidas.forEach(({ dia, total }) => {
-    map[dia] = { dia, curtidas: total, views: 0 }
-  })
-  views.forEach(({ dia, total }) => {
-    if (!map[dia]) map[dia] = { dia, curtidas: 0, views: 0 }
-    map[dia].views = total
-  })
-  return Object.values(map).sort((a, b) => a.dia.localeCompare(b.dia))
-}
-
+  fetchMinhaEmpresa,
+  fetchPublicacoes,
+  fetchAvisos,
+} from "../lib/queries";
+import { Message } from "../components/FormUI";
+import PublicacaoCard from "../components/PublicacaoCard";
 export default function Painel() {
-  const { user, profile, loading, signOut } = useAuth()
-  const navigate = useNavigate()
-  const empreendimentos = useEmpreendimentos()
-  const [metricas, setMetricas] = useState<Metricas | null>(null)
-  const [carregando, setCarregando] = useState(true)
-
-  const meuEmpreendimentoId = profile?.empreendimento_id
-  const meuEmpreendimento = empreendimentos.find((e) => e.id === meuEmpreendimentoId)
-
+  const auth = useAuth(),
+    [params] = useSearchParams();
+  const state = useLoad(async () => {
+    if (!auth.user) return null;
+    const empresa = await fetchMinhaEmpresa(auth.user.id);
+    if (!empresa) return { empresa: null, posts: [], avisos: [] };
+    const [posts, avisos] = await Promise.all([
+      fetchPublicacoes(empresa.id),
+      fetchAvisos(empresa.id),
+    ]);
+    return { empresa, posts, avisos };
+  }, auth.user?.id ?? "");
   useEffect(() => {
-    if (!meuEmpreendimentoId) return
-    getMetricasEmpresa(meuEmpreendimentoId).then((m) => {
-      setMetricas(m)
-      setCarregando(false)
-    })
-  }, [meuEmpreendimentoId])
-
-  if (loading) return <div className="container-page py-20 text-center text-forest-500">Carregando…</div>
-  if (!user) return <Navigate to="/entrar" replace />
-
-  const graficoDados = metricas
-    ? mergeSeriesPorDia(metricas.curtidasSerie, metricas.viewsSerie)
-    : []
-
+    const refresh = () => {
+      if (document.visibilityState === "visible") state.refresh();
+    };
+    const interval = window.setInterval(refresh, 30000);
+    window.addEventListener("focus", refresh);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("focus", refresh);
+    };
+  }, [state.refresh]);
+  if (auth.loading)
+    return <p className="container-page py-14">Carregando acesso…</p>;
+  if (!auth.user) return <Navigate to="/entrar" replace />;
+  if (auth.isAdmin) return <Navigate to="/admin" replace />;
+  const d = state.data;
   return (
-    <div className="container-page py-10 sm:py-14">
-      <div className="flex items-start justify-between">
-        <SectionTitle
-          eyebrow="Meu painel"
-          title="Métricas do empreendimento"
-          desc="Acompanhe curtidas e visualizações da sua página na vitrine."
-        />
-        <button
-          onClick={async () => { await signOut(); navigate('/entrar') }}
-          className="btn-ghost mt-1 text-sm"
-        >
-          Sair
-        </button>
+    <div className="container-page py-10">
+      <div className="flex flex-wrap items-start justify-between gap-5">
+        <div>
+          <span className="eyebrow">Área do empreendedor</span>
+          <h1 className="mt-2 font-display text-3xl">
+            {d?.empresa?.nome ?? "Meu painel"}
+          </h1>
+          <p className="mt-2 text-forest-600">
+            Apresente seu negócio e acompanhe suas publicações.
+          </p>
+        </div>
+        <Link to="/publicar" className="btn-primary px-8">
+          + Publicar
+        </Link>
       </div>
-
-      {!meuEmpreendimentoId && (
-        <div className="card mt-10 p-8 text-center">
-          <p className="text-forest-600">Sua conta ainda não está vinculada a um empreendimento.</p>
-          <Link to="/cadastro" className="btn-primary mt-4">
-            Cadastrar empreendimento
-          </Link>
+      {params.get("senha") === "alterada" && (
+        <div className="mt-5">
+          <Message>Senha alterada com sucesso.</Message>
         </div>
       )}
-
-      {meuEmpreendimentoId && (
-        <>
-          {/* Cabeçalho do empreendimento */}
-          {meuEmpreendimento && (
-            <div className="mt-8 flex items-center gap-4">
-              <div
-                className="h-12 w-12 rounded-xl"
-                style={{ background: `linear-gradient(135deg, ${meuEmpreendimento.cor}, #0a2015)` }}
-              />
-              <div>
-                <p className="font-display font-700 text-forest-800">{meuEmpreendimento.nome}</p>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-forest-500">{meuEmpreendimento.categoria}</span>
-                  <span className={`rounded-full px-2 py-0.5 text-xs font-600 ${
-                    meuEmpreendimento.aprovado
-                      ? 'bg-forest-100 text-forest-700'
-                      : 'bg-sun-500/20 text-sun-600'
-                  }`}>
-                    {meuEmpreendimento.aprovado ? '✓ Publicado' : '⏳ Aguardando aprovação'}
-                  </span>
-                </div>
-              </div>
-              <Link to={`/vitrine/${meuEmpreendimentoId}`} className="btn-ghost ml-auto text-sm">
-                Ver página →
-              </Link>
-            </div>
-          )}
-
-          {/* Cards de totais */}
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard
-              icon="❤️"
-              label="Curtidas totais"
-              value={carregando ? '—' : String(metricas?.curtidasTotal ?? 0)}
-              cor="rose"
-            />
-            <StatCard
-              icon="👁️"
-              label="Visualizações totais"
-              value={carregando ? '—' : String(metricas?.viewsTotal ?? 0)}
-              cor="river"
-            />
-            <StatCard
-              icon="❤️"
-              label="Curtidas este mês"
-              value={carregando ? '—' : String(
-                metricas?.curtidasSerie
-                  .filter((d) => d.dia >= new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0, 10))
-                  .reduce((a, b) => a + b.total, 0) ?? 0
+      {(auth.error || state.error) && (
+        <div className="mt-6">
+          <Message error>{auth.error || state.error}</Message>
+        </div>
+      )}
+      <div className="mt-6 flex flex-wrap gap-4 text-sm">
+        <Link className="underline" to="/redefinir-senha">
+          Alterar minha senha
+        </Link>
+        <button className="underline" onClick={state.refresh}>
+          Atualizar publicações
+        </button>
+        {d?.empresa?.aprovado && (
+          <Link className="underline" to={`/vitrine/${d.empresa.id}`}>
+            Ver meu perfil público
+          </Link>
+        )}
+      </div>
+      {state.loading ? (
+        <p className="py-12">Carregando publicações…</p>
+      ) : d && !d.empresa ? (
+        <div className="card mt-8 space-y-4 p-8">
+          <h2 className="font-display text-2xl">
+            Seu negócio merece ser conhecido
+          </h2>
+          <p>
+            Clique em Publicar, preencha as informações do empreendimento e
+            envie sua primeira publicação. Depois da análise, ela aparece no seu
+            perfil público.
+          </p>
+          <Link className="btn-primary" to="/publicar">
+            Publicar pela primeira vez
+          </Link>
+        </div>
+      ) : (
+        d?.empresa && (
+          <>
+            <section className="card mt-8 p-6" aria-label="Avisos da equipe">
+              <h2 className="font-display text-xl font-semibold">
+                Avisos da equipe
+              </h2>
+              {d.avisos.length ? (
+                d.avisos.slice(0, 5).map((a) => (
+                  <p
+                    key={a.id}
+                    className="mt-4 border-t border-forest-100 pt-3 text-sm"
+                  >
+                    <time className="mr-3 text-forest-500">
+                      {new Date(a.created_at).toLocaleDateString("pt-BR")}
+                    </time>
+                    {a.mensagem}
+                  </p>
+                ))
+              ) : (
+                <p className="mt-3">Os retornos da equipe aparecerão aqui.</p>
               )}
-              cor="rose"
-              small
-            />
-            <StatCard
-              icon="👁️"
-              label="Views este mês"
-              value={carregando ? '—' : String(
-                metricas?.viewsSerie
-                  .filter((d) => d.dia >= new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().slice(0, 10))
-                  .reduce((a, b) => a + b.total, 0) ?? 0
+            </section>
+            <section className="mt-8 space-y-5">
+              <h2 className="font-display text-2xl">Minhas publicações</h2>
+              {d.posts.length ? (
+                d.posts.map((p) => (
+                  <div key={p.id}>
+                    <PublicacaoCard post={p} showStatus />
+                    {p.status === "rejeitado" && (
+                      <Link className="btn-primary mt-3" to="/publicar">
+                        Enviar nova versão para análise
+                      </Link>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <Message>
+                  Você ainda não enviou publicações. Clique em Publicar para
+                  começar.
+                </Message>
               )}
-              cor="river"
-              small
-            />
-          </div>
-
-          {/* Gráfico */}
-          <div className="card mt-8 p-6">
-            <h3 className="font-display font-700 text-forest-800">Evolução nos últimos 30 dias</h3>
-            {!isSupabaseConfigured ? (
-              <p className="mt-4 text-sm text-forest-400">
-                Configure o Supabase para ver dados reais no gráfico.
-              </p>
-            ) : carregando ? (
-              <p className="mt-4 text-sm text-forest-400">Carregando dados…</p>
-            ) : graficoDados.length === 0 ? (
-              <p className="mt-4 text-sm text-forest-400">
-                Ainda sem interações registradas. Compartilhe sua página!
-              </p>
-            ) : (
-              <ResponsiveContainer width="100%" height={280} className="mt-4">
-                <LineChart data={graficoDados.map((d) => ({ ...d, dia: fmtDia(d.dia) }))}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e8f0e9" />
-                  <XAxis dataKey="dia" tick={{ fontSize: 12 }} />
-                  <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
-                  <Tooltip />
-                  <Legend />
-                  <Line type="monotone" dataKey="curtidas" stroke="#e11d48" strokeWidth={2} dot={false} name="Curtidas" />
-                  <Line type="monotone" dataKey="views" stroke="#0369a1" strokeWidth={2} dot={false} name="Visualizações" />
-                </LineChart>
-              </ResponsiveContainer>
-            )}
-          </div>
-
-          <div className="mt-6 card p-5 text-sm text-forest-600">
-            💡 <strong>Dica:</strong> Compartilhe o link da sua página na vitrine nas redes sociais para aumentar suas visualizações e curtidas — isso dá mais visibilidade ao seu empreendimento.
-          </div>
-        </>
+            </section>
+          </>
+        )
       )}
     </div>
-  )
-}
-
-function StatCard({
-  icon,
-  label,
-  value,
-  cor,
-  small,
-}: {
-  icon: string
-  label: string
-  value: string
-  cor: 'rose' | 'river'
-  small?: boolean
-}) {
-  return (
-    <div className="card p-5">
-      <div className="flex items-center gap-2">
-        <span className="text-xl">{icon}</span>
-        <span className="text-xs text-forest-500">{label}</span>
-      </div>
-      <p className={`mt-2 font-display font-800 ${small ? 'text-2xl' : 'text-3xl'} ${
-        cor === 'rose' ? 'text-rose-600' : 'text-river-600'
-      }`}>
-        {value}
-      </p>
-    </div>
-  )
+  );
 }
