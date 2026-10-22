@@ -79,6 +79,7 @@ export default function Vitrine() {
           title="Empreendimentos da sociobiodiversidade"
           desc="Negócios da floresta, aprovados pela curadoria do Observatório. Conheça histórias, produtos e formas de contato."
         />
+        <Link className="btn-primary" to="/formulario/vitrine">Cadastrar na vitrine</Link>
         <div className="relative sm:w-72">
           <input
             value={busca}

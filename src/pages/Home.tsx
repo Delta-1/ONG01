@@ -252,7 +252,7 @@ export default function Home() {
               simples da nossa equipe.
             </p>
             <Link
-              to="/cadastro"
+              to="/formulario/vitrine"
               className="btn mt-7 bg-sun-500 text-forest-950 hover:bg-sun-400"
             >
               Cadastrar meu empreendimento

@@ -151,3 +151,55 @@ export function mensagemErro(error: unknown) {
     return "Sua sessão expirou. Entre novamente.";
   return message || "Não foi possível concluir a operação. Tente novamente.";
 }
+
+export async function fetchBaseObservatorio(): Promise<
+  import("./parceiros").RegistroObservatorio[]
+> {
+  const [empresas, parceiros] = await Promise.all([
+    fetchEmpreendimentos(),
+    readAllPages((from, to) =>
+      db()
+        .from("parceiros_observatorio")
+        .select("*")
+        .eq("aprovado", true)
+        .order("id")
+        .range(from, to),
+    ),
+  ]);
+  const vinculados = new Set(parceiros.map((p) => p.empreendimento_id));
+  return [
+    ...parceiros.map((p) => ({
+      id: String(p.id),
+      nome: String(p.nome),
+      municipioCodigo: String(p.municipio_codigo),
+      categoria: String(p.categoria),
+      tipo: String(p.tipo),
+      produtos: p.produtos as string[],
+      empresaId: p.empreendimento_id as string | null,
+      trabalhadores: p.trabalhadores as number | null,
+      familias: p.familias as number | null,
+      producao_anual_ton:
+        p.producao_anual_ton === null ? null : Number(p.producao_anual_ton),
+      ano_referencia: p.ano_referencia as number | null,
+      funcionamento: String(p.funcionamento),
+      site: String(p.site),
+    })),
+    ...empresas
+      .filter((e) => !vinculados.has(e.id))
+      .map((e) => ({
+        id: e.id,
+        nome: e.nome,
+        municipioCodigo: e.municipioCodigo,
+        categoria: e.categoria,
+        tipo: e.tipo || "Não informado",
+        produtos: e.produtos,
+        empresaId: e.id,
+        trabalhadores: null,
+        familias: null,
+        producao_anual_ton: null,
+        ano_referencia: null,
+        funcionamento: "nao_informado",
+        site: "",
+      })),
+  ];
+}

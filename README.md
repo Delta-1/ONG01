@@ -61,3 +61,17 @@ Em `/admin`, **Exportar todos os empreendimentos (.csv)** baixa uma planilha com
 A aba **Empreendimentos e acessos** permite buscar por nome, categoria, comunidade ou responsável e filtrar por município. Use **Publicar por uma empresa** ou **Criar publicação** no cadastro da empresa; o envio passa pela análise e precisa de aprovação. Os perfis aprovados e suas publicações aprovadas são públicos em `/vitrine`; o dashboard público em `/observatorio` conta os perfis aprovados por município e região.
 
 A leitura de empreendimentos e da exportação percorre todas as páginas da API. O CSV usa UTF-8 com BOM, separador `;` e neutraliza conteúdo que poderia ser interpretado como fórmula por uma planilha. `tests/export-empresas.test.ts` verifica essas propriedades e a paginação com mais de mil registros.
+
+## Dois tipos de participação no Observatório
+
+- `/formulario/vitrine`: autocadastro de quem oferece produtos ou serviços, com perfil na vitrine e participação no dashboard após aprovação.
+- `/formulario/dashboard`: captação de dados e parceria sem perfil nem publicação na vitrine. Não exige catálogo; permite informar colaboração, pesquisa, apoio ou articulação.
+- `/formulario` continua funcionando e permite escolher entre as duas finalidades. Nenhum desses formulários exige criar uma conta.
+
+A coleta inclui tipo de organização, município/região, funcionamento, presença e situação declarada de CNPJ, site, colaboração, pessoas que trabalham, famílias envolvidas e produção anual em toneladas. Quantidades são opcionais e exigem ano de referência quando preenchidas; ausência não equivale a zero. A situação do CNPJ é autodeclarada e não representa consulta automática à Receita Federal. O número do CNPJ e contatos do formulário permanecem na fila administrativa, fora da tabela pública de indicadores.
+
+A aprovação é atômica. Ambos os tipos geram um registro aprovado em `parceiros_observatorio`; somente a finalidade vitrine cria empreendimento e apresentação pública. O dashboard une parceiros novos e empresas anteriores sem contar duas vezes o vínculo entre eles. Números só são somados após selecionar um ano, com cobertura das respostas informadas. A exportação administrativa inclui as duas finalidades, as informações de cadastro e os novos indicadores.
+
+A migração `20261022172919_observatorio_partner_intake.sql` preserva formulários anteriores, restringe as escritas a funções protegidas e mantém RLS nos dados públicos e administrativos. `tests/partner-intake.sql` testa finalidades, permissões, validações, aprovação, privacidade, zero e ausência em transação revertida. Não é necessário mudar a Edge Function `cadastro-rapido`, que já encaminha os campos para a validação no banco.
+
+Cadastros de teste arquivados com `dados.is_demo=true` ficam fora da fila administrativa e da exportação. Parceiros de teste têm `aprovado=false`; empresas de teste usam `is_demo=true`.

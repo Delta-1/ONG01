@@ -161,9 +161,7 @@ export default function Admin() {
         ))}
       </div>
       <div className="card mt-6 p-5">
-        <h2 className="font-semibold">
-          Link para receber novos empreendedores
-        </h2>
+        <h2 className="font-semibold">Link para criar uma conta de acesso</h2>
         <input
           aria-label="Link de cadastro"
           className="mt-3 w-full bg-transparent text-sm"

@@ -16,8 +16,18 @@ export default function EmpreendimentoDetalhe() {
       .maybeSingle();
     if (error) throw error;
     if (!data) return null;
-    const posts = await fetchPublicacoes(id);
+    const [posts, partner] = await Promise.all([
+      fetchPublicacoes(id),
+      db()
+        .from("parceiros_observatorio")
+        .select("site")
+        .eq("empreendimento_id", id!)
+        .eq("aprovado", true)
+        .maybeSingle(),
+    ]);
+    if (partner.error) throw partner.error;
     return {
+      site: partner.data?.site as string | undefined,
       empresa: mapEmpresa(data),
       posts: posts.filter((p) => p.status === "aprovado"),
     };
@@ -84,6 +94,16 @@ export default function EmpreendimentoDetalhe() {
               href={`mailto:${e.contato.email}`}
             >
               {e.contato.email}
+            </a>
+          )}
+          {state.data.site && /^https?:\/\//.test(state.data.site) && (
+            <a
+              className="block break-words underline"
+              href={state.data.site}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Visitar site da organização
             </a>
           )}
           {e.contato.instagram && (
