@@ -1,134 +1,270 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import AcreMap from "../components/AcreMap";
-import { useMunicipios, useEmpreendimentos } from "../hooks/useData";
+import { useLoad } from "../hooks/useData";
+import { fetchBaseObservatorio } from "../lib/queries";
+import { resumoIndicador } from "../lib/parceiros";
+import { MUNICIPIOS } from "../data/municipios";
 import { METRICA_POR_ID } from "../data/metricas";
 import { Message } from "../components/FormUI";
+
 export default function Dashboard() {
-  const { municipios, byCode, totais, loading, error } = useMunicipios(),
-    empresas = useEmpreendimentos(),
-    [selected, setSelected] = useState<string | null>(null);
-  const mun = selected ? byCode[selected] : null;
-  const categories = [...new Set(empresas.map((e) => e.categoria))];
+  const state = useLoad(fetchBaseObservatorio);
+  const [selected, setSelected] = useState(""),
+    [year, setYear] = useState("");
+  const all = state.data ?? [];
+  const rows = all.filter(
+    (r) =>
+      (!selected || r.municipioCodigo === selected) &&
+      (!year || String(r.ano_referencia) === year),
+  );
+  const geoRows = all.filter((r) => !year || String(r.ano_referencia) === year);
+  const byCode = Object.fromEntries(
+    MUNICIPIOS.map((m) => [
+      m.codigo,
+      {
+        ...m,
+        indicadores: {
+          ...m.indicadores,
+          empreendimentos: geoRows.filter((r) => r.municipioCodigo === m.codigo)
+            .length,
+        },
+      },
+    ]),
+  );
+  const years = [
+    ...new Set(
+      all.flatMap((r) => (r.ano_referencia === null ? [] : [r.ano_referencia])),
+    ),
+  ].sort((a, b) => b - a);
+  const number = (n: number) =>
+    n.toLocaleString("pt-BR", { maximumFractionDigits: 3 });
+  function distribution(key: "tipo" | "categoria" | "produtos") {
+    const counts = new Map<string, number>();
+    for (const r of rows)
+      for (const label of new Set(
+        key === "produtos" ? r.produtos : [r[key] || "Não informado"],
+      ))
+        counts.set(label, (counts.get(label) ?? 0) + 1);
+    return [...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+  }
   return (
     <div className="container-page py-10">
-      <span className="eyebrow">Base em construção com dados reais</span>
+      <span className="eyebrow">Observatório · Dados aprovados</span>
       <h1 className="mt-3 font-display text-3xl text-forest-900">
-        Empreendimentos do Acre
+        Parceiros e empreendimentos do Acre
       </h1>
       <p className="mt-3 max-w-3xl text-forest-600">
-        Este mapa conta os empreendimentos reais que passaram pela curadoria e
-        têm perfil publicado. Não representa um censo de todos os negócios do
-        Acre.
+        Distribuição geográfica, tipos de organização e produtos ou serviços.
+        Inclui parceiros com vitrine e parceiros que contribuem somente com
+        dados e colaboração. A base é um mapeamento em construção.
       </p>
-      {error && (
-        <div className="mt-5">
-          <Message error>{error}</Message>
-        </div>
-      )}
-      {loading ? (
-        <p className="py-10">Consultando cadastros validados…</p>
+      <div className="mt-5 flex flex-wrap gap-3">
+        <Link className="btn-primary" to="/formulario/dashboard">
+          Contribuir com dados e parceria
+        </Link>
+        <Link className="btn-ghost" to="/formulario/vitrine">
+          Cadastrar na vitrine
+        </Link>
+      </div>
+      {state.error && <Message error>{state.error}</Message>}
+      {state.loading ? (
+        <p className="py-10">Consultando dados validados…</p>
       ) : (
         <>
-          <div className="mt-7 grid gap-4 sm:grid-cols-3">
+          <div className="card mt-6 grid gap-4 p-5 sm:grid-cols-2">
+            <label className="text-sm font-semibold">
+              Município
+              <select
+                className="mt-2 w-full rounded-lg border border-forest-200 p-3"
+                value={selected}
+                onChange={(e) => setSelected(e.target.value)}
+              >
+                <option value="">Todos os municípios</option>
+                {MUNICIPIOS.map((m) => (
+                  <option key={m.codigo} value={m.codigo}>
+                    {m.nome}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="text-sm font-semibold">
+              Ano de referência
+              <select
+                className="mt-2 w-full rounded-lg border border-forest-200 p-3"
+                value={year}
+                onChange={(e) => setYear(e.target.value)}
+              >
+                <option value="">Todos os cadastros</option>
+                {years.map((y) => (
+                  <option key={y} value={y}>
+                    {y}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              [totais.empreendimentos, "Empreendimentos publicados"],
+              [rows.length, "Parceiros mapeados"],
+              [rows.filter((r) => r.empresaId).length, "Com perfil na vitrine"],
               [
-                municipios.filter((m) => m.indicadores.empreendimentos > 0)
-                  .length,
-                "Municípios com cadastros",
+                rows.filter((r) => !r.empresaId).length,
+                "Somente dashboard e parceria",
               ],
-              [categories.length, "Cadeias representadas"],
+              [
+                new Set(rows.map((r) => r.municipioCodigo)).size,
+                "Municípios representados",
+              ],
             ].map(([n, label]) => (
-              <div className="card p-6" key={label}>
+              <div className="card p-5" key={label}>
                 <strong className="font-display text-3xl">{n}</strong>
                 <p className="mt-2 text-sm text-forest-500">{label}</p>
               </div>
             ))}
           </div>
-          {!empresas.length && (
-            <div className="mt-6">
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            {(
+              [
+                ["trabalhadores", "Pessoas que trabalham"],
+                ["familias", "Famílias envolvidas"],
+                ["producao_anual_ton", "Produção anual (t)"],
+              ] as const
+            ).map(([key, label]) => {
+              const summary = resumoIndicador(rows, key);
+              return (
+                <div className="card p-5" key={key}>
+                  <strong className="font-display text-3xl">
+                    {year && summary.informados ? number(summary.total) : "—"}
+                  </strong>
+                  <p className="mt-2 text-sm">{label}</p>
+                  <p className="mt-2 text-xs text-forest-500">
+                    {year
+                      ? `${summary.informados} de ${rows.length} parceiro(s) informaram este número em ${year}.`
+                      : "Selecione um ano para consultar as quantidades."}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+          <p className="mt-3 text-xs text-forest-500">
+            Campos sem resposta não são tratados como zero. As somas usam
+            números declarados pelos parceiros e aprovados pela equipe; pessoas
+            e famílias podem participar de mais de uma organização.
+          </p>
+          {!rows.length && (
+            <div className="mt-5">
               <Message>
-                A coleta de dados reais começou. Os primeiros cadastros
-                aparecerão após a aprovação.{" "}
-                <Link className="underline" to="/cadastro">
-                  Cadastre seu empreendimento
-                </Link>
-                .
+                Nenhum cadastro aprovado para os filtros selecionados.
               </Message>
             </div>
           )}
-          <div className="mt-7 grid gap-6 lg:grid-cols-3">
+          <div className="mt-6 grid gap-6 lg:grid-cols-3">
             <div className="card p-5 lg:col-span-2">
               <h2 className="mb-4 font-display text-xl">
-                Mapa dos 22 municípios
+                Distribuição nos 22 municípios
               </h2>
               <AcreMap
-                metrica={METRICA_POR_ID.empreendimentos}
-                selectedCode={selected}
-                onSelect={setSelected}
+                metrica={{
+                  ...METRICA_POR_ID.empreendimentos,
+                  label: "Parceiros mapeados",
+                }}
+                selectedCode={selected || null}
+                onSelect={(code) => setSelected(code ?? "")}
                 byCode={byCode}
               />
-              <label className="mt-5 block text-sm font-semibold">
-                Selecione um município
-                <select
-                  className="mt-2 w-full rounded-lg border border-forest-200 bg-white p-3"
-                  value={selected ?? ""}
-                  onChange={(e) => setSelected(e.target.value || null)}
-                >
-                  <option value="">Todos os municípios</option>
-                  {municipios.map((m) => (
-                    <option key={m.codigo} value={m.codigo}>
-                      {m.nome}
-                    </option>
-                  ))}
-                </select>
-              </label>
             </div>
-            <div className="card p-6">
-              <h2 className="font-display text-2xl">
-                {mun?.nome ?? "Por região"}
-              </h2>
-              {mun ? (
-                <>
-                  <p className="mt-2 text-sm text-forest-500">{mun.regiao}</p>
-                  <p className="mt-5">
-                    {mun.indicadores.empreendimentos} empreendimento(s)
-                    publicado(s)
-                  </p>
-                  <div className="mt-5 space-y-3">
-                    {empresas
-                      .filter((e) => e.municipioCodigo === mun.codigo)
-                      .map((e) => (
-                        <Link
-                          className="block underline"
-                          to={`/vitrine/${e.id}`}
-                          key={e.id}
-                        >
-                          {e.nome}
-                        </Link>
-                      ))}
-                  </div>
-                </>
-              ) : (
-                ["Vale do Acre", "Vale do Juruá"].map((r) => (
-                  <p className="mt-5" key={r}>
-                    {r}:{" "}
-                    <strong>
-                      {municipios
-                        .filter((m) => m.regiao === r)
-                        .reduce((n, m) => n + m.indicadores.empreendimentos, 0)}
-                    </strong>
-                  </p>
-                ))
-              )}
+            <div className="card p-5">
+              <h2 className="font-display text-xl">Por região</h2>
+              {["Vale do Acre", "Vale do Juruá"].map((regiao) => (
+                <p className="mt-5" key={regiao}>
+                  {regiao}:{" "}
+                  <strong>
+                    {
+                      rows.filter(
+                        (r) =>
+                          MUNICIPIOS.find((m) => m.codigo === r.municipioCodigo)
+                            ?.regiao === regiao,
+                      ).length
+                    }
+                  </strong>
+                </p>
+              ))}
             </div>
           </div>
-          <p className="mt-6 text-sm text-forest-500">
-            Produção, faturamento, famílias e área manejada só serão exibidos
-            quando houver dados reais coletados e validados para esses
-            indicadores.
-          </p>
+          <div className="mt-6 grid gap-6 lg:grid-cols-3">
+            {(
+              [
+                ["tipo", "Tipos de organização"],
+                ["categoria", "Atividades principais"],
+                ["produtos", "Produtos e serviços"],
+              ] as const
+            ).map(([key, title]) => (
+              <section className="card p-5" key={key}>
+                <h2 className="font-display text-xl">{title}</h2>
+                <p className="mt-2 text-xs text-forest-500">
+                  Quantidade de parceiros por item
+                </p>
+                <ul className="mt-4 space-y-3">
+                  {distribution(key).map(([label, count]) => (
+                    <li key={label}>
+                      <div className="flex justify-between gap-3 text-sm">
+                        <span className="break-words">{label}</span>
+                        <strong>{count}</strong>
+                      </div>
+                      <div className="mt-1 h-2 rounded bg-forest-50">
+                        <div
+                          className="h-2 rounded bg-forest-600"
+                          style={{
+                            width: `${rows.length ? (count / rows.length) * 100 : 0}%`,
+                          }}
+                        />
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+                {!distribution(key).length && (
+                  <p className="mt-4 text-sm text-forest-500">
+                    Sem informações neste filtro.
+                  </p>
+                )}
+              </section>
+            ))}
+          </div>
+          <section className="card mt-6 p-5">
+            <h2 className="font-display text-xl">
+              Parceiros nos filtros selecionados
+            </h2>
+            <ul className="mt-4 divide-y divide-forest-100">
+              {rows.map((r) => (
+                <li
+                  className="flex flex-wrap items-start justify-between gap-3 py-4"
+                  key={r.id}
+                >
+                  <div>
+                    <p className="font-semibold">{r.nome}</p>
+                    <p className="text-sm text-forest-500">
+                      {
+                        MUNICIPIOS.find((m) => m.codigo === r.municipioCodigo)
+                          ?.nome
+                      }{" "}
+                      · {r.tipo} · {r.categoria}
+                    </p>
+                  </div>
+                  {r.empresaId ? (
+                    <Link
+                      className="text-sm underline"
+                      to={`/vitrine/${r.empresaId}`}
+                    >
+                      Ver perfil na vitrine
+                    </Link>
+                  ) : (
+                    <span className="chip">Somente dashboard e parceria</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </section>
         </>
       )}
     </div>

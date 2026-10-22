@@ -70,3 +70,30 @@ await assert.rejects(
 console.log(
   "PASS: CSV com acentos, fórmulas neutralizadas, filas sem duplicação, dados de acesso excluídos e paginação completa com mais de 1000 registros",
 );
+
+const semVitrine = {
+  ...intake,
+  id: "dashboard-aprovado",
+  status: "aprovado",
+  empreendimento_id: null,
+  dados: {
+    ...intake.dados,
+    finalidade: "dashboard" as const,
+    tipo: "Associação",
+    possui_cnpj: "nao",
+    trabalhadores: 4,
+    familias: null,
+    ano_referencia: 2026,
+  },
+};
+const updated = criarPlanilhaEmpresas([empresa], [semVitrine], []);
+assert.equal(
+  updated.total,
+  2,
+  "Parceiro aprovado sem vitrine deve entrar na exportação",
+);
+assert.ok(
+  updated.csv.includes("Aprovado (dashboard)") &&
+    updated.csv.includes("Ano de referência"),
+);
+assert.equal(criarPlanilhaEmpresas([], [{...semVitrine,dados:{...semVitrine.dados,is_demo:true}}], []).total,0,"Teste arquivado não entra nos relatórios");

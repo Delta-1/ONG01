@@ -57,6 +57,11 @@ export default function App() {
             <Route path="/legislacao" element={<Legislacao />} />
             <Route path="/sobre" element={<Sobre />} />
             <Route path="/formulario" element={<FormularioRapido />} />
+            <Route path="/formulario/vitrine" element={<FormularioRapido />} />
+            <Route
+              path="/formulario/dashboard"
+              element={<FormularioRapido />}
+            />
             <Route path="/cadastro-rapido" element={<FormularioRapido />} />
             <Route path="/cadastro" element={<Cadastro />} />
             <Route path="/entrar" element={<Login />} />
