@@ -34,6 +34,14 @@ Foram removidos os links genéricos de Instagram/YouTube. Os perfis oficiais pod
 
 A navegação inclui link para pular ao conteúdo, foco visível, menu mobile com estado expandido e uma identificação acessível da busca. A preferência por movimento reduzido continua sendo respeitada.
 
+## Movimento e interação
+
+A abertura combina fundo de floresta em camadas, correntes suaves e folhas que oscilam para sugerir vento. O deslocamento do cursor gera uma resposta discreta de profundidade, sem movimentar textos e controles. Os grafismos flutuam sobre três composições: mapa do território, diversidade de produtos e rede de parceiros.
+
+O carrossel troca de destaque a cada sete segundos. Há setas, seleção direta de capítulos, navegação por setas do teclado, arraste horizontal com mouse ou toque e botão para pausar/retomar. Navegação manual interrompe a rotação; foco e ponteiro sobre a região suspendem a troca para permitir leitura. A rotação e os efeitos pausam ao sair da tela ou ocultar a aba. A preferência por movimento reduzido desliga os efeitos e a rotação automática, preservando todos os controles manuais.
+
+As seções abaixo aparecem suavemente conforme entram no campo de visão. Não foi acrescentado nenhum dado fictício.
+
 ## Validar e publicar
 
 ```

@@ -21,6 +21,7 @@ export function BrandArt({
       aria-hidden="true"
       className={`pointer-events-none select-none object-contain ${className}`}
       decoding="async"
+      draggable={false}
     />
   );
 }

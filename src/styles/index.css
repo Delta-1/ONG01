@@ -214,113 +214,6 @@ input[type="radio"] {
 .brand-symbol-light {
   width: 80px;
 }
-.brand-hero {
-  position: relative;
-  overflow: hidden;
-  background: #fff9eb;
-}
-.brand-hero-title {
-  margin-top: 24px;
-  font-size: clamp(2.9rem, 4.8vw, 4.6rem);
-  line-height: 1.04;
-  letter-spacing: -0.045em;
-  color: #166340;
-  font-weight: 700;
-}
-.brand-hero-title > span {
-  color: #9a0318;
-}
-.brand-territory {
-  position: relative;
-  isolation: isolate;
-  display: flex;
-  min-height: 490px;
-  flex-direction: column;
-  justify-content: space-between;
-  border: 1px solid #d7ddbf;
-  border-radius: 44% 44% 24px 24px;
-  background: #f1eedc;
-  padding: 44px 28px 24px;
-}
-.brand-territory-heading {
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 0 12px;
-}
-.brand-territory-heading > span {
-  max-width: 110px;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  color: #166340;
-}
-.brand-hero-river {
-  position: absolute;
-  z-index: -1;
-  top: 52px;
-  left: -60px;
-  width: 130%;
-  max-width: none;
-  transform: rotate(57deg);
-}
-.brand-hero-nut {
-  position: absolute;
-  top: 10px;
-  right: -12px;
-  width: 64px;
-  height: 90px;
-  transform: rotate(22deg);
-}
-.brand-hero-fruit {
-  position: absolute;
-  bottom: 108px;
-  left: -26px;
-  width: 86px;
-  height: 86px;
-  transform: rotate(-12deg);
-}
-.brand-map {
-  position: relative;
-  margin: 24px 8px;
-}
-.brand-map button {
-  border-radius: 16px;
-}
-.brand-map button:focus-visible {
-  outline: 3px solid #9a0318;
-  outline-offset: 4px;
-}
-.brand-map svg {
-  overflow: visible;
-}
-.brand-map svg path {
-  fill: #166340;
-  stroke: #fff9eb;
-}
-.brand-map button:hover svg path {
-  fill: #10492f;
-}
-.brand-map button > span {
-  border-radius: 100px;
-  background: #fff9eb;
-  padding: 10px 12px;
-  font-size: 12px;
-  color: #166340;
-}
-.brand-territory-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-left: 12px;
-  color: #166340;
-  font-family: "Stack Sans Headline", sans-serif;
-  font-size: 22px;
-  font-weight: 600;
-  line-height: 1.1;
-}
 .brand-stats {
   background: #166340;
   color: #fff9eb;
@@ -445,29 +338,6 @@ input[type="radio"] {
   opacity: 0.12;
   transform: rotate(-24deg);
 }
-.brand-organic {
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-}
-.brand-organic-river {
-  position: absolute;
-  width: 900px;
-  max-width: none;
-  bottom: -160px;
-  right: -150px;
-  opacity: 0.14;
-  transform: rotate(-20deg);
-}
-.brand-organic-seed {
-  position: absolute;
-  width: 120px;
-  top: -30px;
-  right: 24px;
-  opacity: 0.15;
-  transform: rotate(20deg);
-}
 .page-artwork {
   position: relative;
   display: flex;
@@ -495,32 +365,6 @@ input[type="radio"] {
   transform: rotate(-8deg);
 }
 @media (max-width: 767px) {
-  .brand-territory {
-    min-height: auto;
-    padding: 30px 24px 20px;
-    border-radius: 100px 100px 20px 20px;
-  }
-  .brand-hero-title {
-    font-size: clamp(2.8rem, 10vw, 4rem);
-  }
-  .brand-hero-nut {
-    right: 0;
-    width: 45px;
-    height: 65px;
-  }
-  .brand-hero-fruit {
-    left: -10px;
-    width: 62px;
-  }
-  .brand-map {
-    margin: 20px 8px;
-  }
-  .brand-territory-heading {
-    padding: 0 14px;
-  }
-  .brand-territory-bottom {
-    font-size: 20px;
-  }
   .brand-stat {
     padding-inline: 16px;
   }

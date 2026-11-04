@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import AcreMapHero from "../components/AcreMapHero";
+import HeroCarousel from "../components/HeroCarousel";
+import { useScrollReveal } from "../hooks/useScrollReveal";
 import { SectionTitle } from "../components/ui";
-import { BrandArt, BrandRibbon } from "../components/BrandArt";
+import { BrandArt } from "../components/BrandArt";
 import {
   useMunicipios,
   useEmpreendimentos,
@@ -10,6 +11,7 @@ import {
 import { fmtInt, fmtData } from "../lib/format";
 
 export default function Home() {
+  const page = useScrollReveal();
   const { municipios, totais } = useMunicipios();
   const empreendimentos = useEmpreendimentos();
   const noticias = useNoticias();
@@ -18,64 +20,8 @@ export default function Home() {
     .slice(0, 3);
 
   return (
-    <div className="brand-home">
-      <section className="brand-hero">
-        <div className="container-page grid items-center gap-10 py-12 sm:py-16 lg:grid-cols-2 lg:gap-14 lg:py-20">
-          <div className="relative z-10 animate-fade-up">
-            <p className="eyebrow flex items-center gap-3">
-              <span className="h-2 w-2 rounded-full bg-brand-orange" /> Acre ·
-              Amazônia · Sociobiodiversidade
-            </p>
-            <h1 className="brand-hero-title">
-              O valor da
-              <br />
-              floresta em pé,
-              <br />
-              <span>
-                em dados
-                <br className="hidden xl:block" /> e histórias.
-              </span>
-            </h1>
-            <p className="mt-6 max-w-lg text-base leading-relaxed text-forest-700 sm:text-lg">
-              Um olhar para quem vive, produz e mantém a floresta viva. Conheça
-              os empreendimentos da sociobiodiversidade e explore os dados do
-              Acre.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link to="/observatorio" className="btn-primary">
-                Explorar o dashboard <span aria-hidden="true">↗</span>
-              </Link>
-              <Link to="/vitrine" className="btn-ghost">
-                Conhecer a vitrine <span aria-hidden="true">→</span>
-              </Link>
-            </div>
-            <p className="mt-6 text-xs font-medium text-forest-600">
-              Territórios, pessoas e saberes que se conectam.
-            </p>
-          </div>
-          <div className="brand-territory animate-fade-up">
-            <BrandArt motif="rio" className="brand-hero-river" />
-            <BrandArt motif="castanha" className="brand-hero-nut" />
-            <BrandArt motif="fruto" className="brand-hero-fruit" />
-            <div className="brand-territory-heading">
-              <span>UM OLHAR PARA O ACRE</span>
-              <BrandArt motif="olhos" className="w-28" />
-            </div>
-            <div className="brand-map">
-              <AcreMapHero />
-            </div>
-            <div className="brand-territory-bottom">
-              <span>
-                22 municípios.
-                <br />
-                Muitas histórias.
-              </span>
-              <BrandArt motif="semente-oliva" className="h-16 w-16" />
-            </div>
-          </div>
-        </div>
-        <BrandRibbon />
-      </section>
+    <div ref={page} className="brand-home">
+      <HeroCarousel />
 
       <section className="brand-stats" aria-label="Retrato do mapeamento">
         <div className="container-page grid grid-cols-2 gap-y-6 py-9 sm:grid-cols-4">
@@ -104,7 +50,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="container-page py-16 sm:py-20">
+      <section data-scroll-reveal className="container-page py-16 sm:py-20">
         <div className="flex items-end justify-between gap-6">
           <SectionTitle
             eyebrow="O Observatório"
@@ -173,7 +119,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="brand-showcase py-16 sm:py-20">
+      <section data-scroll-reveal className="brand-showcase py-16 sm:py-20">
         <div className="container-page">
           <div className="flex flex-wrap items-end justify-between gap-5">
             <SectionTitle
@@ -250,7 +196,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="container-page py-16 sm:py-20">
+      <section data-scroll-reveal className="container-page py-16 sm:py-20">
         <div className="flex flex-wrap items-end justify-between gap-5">
           <SectionTitle
             eyebrow="Fique por dentro"
@@ -299,7 +245,7 @@ export default function Home() {
         )}
       </section>
 
-      <section className="container-page pb-8">
+      <section data-scroll-reveal className="container-page pb-8">
         <div className="brand-participate">
           <BrandArt motif="rio" className="brand-participate-river" />
           <div className="relative z-10">
