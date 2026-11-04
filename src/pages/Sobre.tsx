@@ -1,9 +1,11 @@
+import { PageArtwork } from "../components/BrandArt";
 import { Link } from "react-router-dom";
 import { SectionTitle } from "../components/ui";
 
 export default function Sobre() {
   return (
     <div className="container-page py-10 sm:py-14">
+      <PageArtwork motif="olhos" />
       <SectionTitle
         eyebrow="Sobre o projeto"
         title="Observatório Acriano da Sócio-bioeconomia"

@@ -1,6 +1,8 @@
+import { novoId } from "../lib/uuid";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Field, TextField, Message, inputClass } from "../components/FormUI";
+import { PageArtwork } from "../components/BrandArt";
 import { MUNICIPIOS } from "../data/municipios";
 import { db, mensagemErro } from "../lib/queries";
 import { TIPOS_ORGANIZACAO } from "../lib/parceiros";
@@ -39,7 +41,7 @@ export default function FormularioRapido() {
       : "vitrine",
   };
   const [form, setForm] = useState(initial),
-    [id, setId] = useState(() => crypto.randomUUID()),
+    [id, setId] = useState(() => novoId()),
     [consent, setConsent] = useState(false),
     [website, setWebsite] = useState(""),
     [busy, setBusy] = useState(false),
@@ -119,7 +121,7 @@ export default function FormularioRapido() {
             onClick={() => {
               setForm(initial);
               setConsent(false);
-              setId(crypto.randomUUID());
+              setId(novoId());
               setSent(false);
             }}
           >
@@ -134,6 +136,9 @@ export default function FormularioRapido() {
   return (
     <div className="container-page py-10">
       <div className="mx-auto max-w-2xl">
+        <PageArtwork
+          motif={form.finalidade === "dashboard" ? "semente-oliva" : "fruto"}
+        />
         <span className="eyebrow">Levantamento de empreendimentos do Acre</span>
         <h1 className="mt-3 font-display text-3xl text-forest-900">
           Cadastro de parceiros do Observatório

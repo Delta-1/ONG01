@@ -1,3 +1,4 @@
+import { PageArtwork } from "../components/BrandArt";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import AcreMap from "../components/AcreMap";
@@ -50,6 +51,7 @@ export default function Dashboard() {
   }
   return (
     <div className="container-page py-10">
+      <PageArtwork motif="semente-verde" />
       <span className="eyebrow">Observatório · Dados aprovados</span>
       <h1 className="mt-3 font-display text-3xl text-forest-900">
         Parceiros e empreendimentos do Acre
