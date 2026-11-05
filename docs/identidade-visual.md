@@ -42,6 +42,8 @@ O movimento é decorativo: correntes suaves, folhas oscilando, grafismos flutuan
 
 O controle de pausa interrompe os efeitos do fundo e dos grafismos. As animações também pausam quando a abertura sai da tela ou a aba fica oculta. A preferência por movimento reduzido desliga os efeitos. O conteúdo continua acessível em todos esses estados.
 
+A assinatura mantém o desenho original dos olhos e desloca somente as pupilas e suas estrelas. Elas acompanham o mouse sobre o símbolo e voltam ao centro ao sair. Em repouso, olham discretamente para um dos lados em intervalos aleatórios de 9 a 24 segundos e retornam ao centro. O efeito pausa fora da tela, em abas ocultas e com movimento reduzido.
+
 ## Validar e publicar
 
 ```
@@ -51,6 +53,8 @@ npm run build
 
 Configure `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` no ambiente do projeto correto da ONG. A chave precisa ser pública (`anon` ou publishable), nunca `service_role`. O código não altera dados, políticas de acesso ou senhas.
 
-As alterações foram preparadas em uma branch do repositório acessível `Delta-1/ONG01`. Elas precisam ser levadas para `sarahsoaresc/observatorio-ccm` e publicadas no projeto Vercel `observatorio-ccm`, preservando o vínculo com `observatorio.comitechicomendes.org`. As conexões atuais não dão acesso a esses dois destinos; portanto o PR não equivale a uma publicação no domínio oficial.
+`Delta-1/ONG01` é o repositório de desenvolvimento e testes. A versão validada é incorporada em `sarahsoaresc/observatorio-ccm`, repositório de produção da ONG. A publicação deve usar o projeto Vercel `observatorio-ccm` e o domínio `observatorio.comitechicomendes.org`.
+
+A transferência preserva a configuração pública do banco de produção, as funções do Supabase, as migrações, os testes e as rotinas de validação já existentes no repositório da ONG. Não copie configurações do ambiente antigo de testes para a produção.
 
 A prévia HTTP também utiliza UUID v4 com `crypto.getRandomValues` quando `crypto.randomUUID` não está disponível. A publicação em HTTPS mantém o caminho nativo já existente.
