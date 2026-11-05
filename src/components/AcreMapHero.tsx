@@ -83,24 +83,6 @@ export default function AcreMapHero() {
             />
           ))}
         </g>
-        {hover && (
-          <text
-            x={W / 2}
-            y={H / 2}
-            textAnchor="middle"
-            className="animate-fade-in fill-white font-display"
-            style={{
-              fontSize: 54,
-              fontWeight: 700,
-              letterSpacing: 6,
-              paintOrder: "stroke",
-            }}
-            stroke="#0a2015"
-            strokeWidth={3}
-          >
-            ACRE
-          </text>
-        )}
       </svg>
 
       <span className="mt-3 flex items-center justify-center gap-2 text-sm font-medium text-forest-700">

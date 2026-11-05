@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
-import HeroCarousel from "../components/HeroCarousel";
-import { useScrollReveal } from "../hooks/useScrollReveal";
+import ForestHero from "../components/ForestHero";
 import { SectionTitle } from "../components/ui";
 import { BrandArt } from "../components/BrandArt";
 import {
@@ -11,7 +10,6 @@ import {
 import { fmtInt, fmtData } from "../lib/format";
 
 export default function Home() {
-  const page = useScrollReveal();
   const { municipios, totais } = useMunicipios();
   const empreendimentos = useEmpreendimentos();
   const noticias = useNoticias();
@@ -20,8 +18,8 @@ export default function Home() {
     .slice(0, 3);
 
   return (
-    <div ref={page} className="brand-home">
-      <HeroCarousel />
+    <div className="brand-home">
+      <ForestHero />
 
       <section className="brand-stats" aria-label="Retrato do mapeamento">
         <div className="container-page grid grid-cols-2 gap-y-6 py-9 sm:grid-cols-4">
@@ -50,7 +48,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section data-scroll-reveal className="container-page py-16 sm:py-20">
+      <section className="container-page py-16 sm:py-20">
         <div className="flex items-end justify-between gap-6">
           <SectionTitle
             eyebrow="O Observatório"
@@ -119,7 +117,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section data-scroll-reveal className="brand-showcase py-16 sm:py-20">
+      <section className="brand-showcase py-16 sm:py-20">
         <div className="container-page">
           <div className="flex flex-wrap items-end justify-between gap-5">
             <SectionTitle
@@ -196,7 +194,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section data-scroll-reveal className="container-page py-16 sm:py-20">
+      <section className="container-page py-16 sm:py-20">
         <div className="flex flex-wrap items-end justify-between gap-5">
           <SectionTitle
             eyebrow="Fique por dentro"
@@ -245,7 +243,7 @@ export default function Home() {
         )}
       </section>
 
-      <section data-scroll-reveal className="container-page pb-8">
+      <section className="container-page pb-8">
         <div className="brand-participate">
           <BrandArt motif="rio" className="brand-participate-river" />
           <div className="relative z-10">

@@ -36,11 +36,11 @@ A navegação inclui link para pular ao conteúdo, foco visível, menu mobile co
 
 ## Movimento e interação
 
-A abertura combina fundo de floresta em camadas, correntes suaves e folhas que oscilam para sugerir vento. O deslocamento do cursor gera uma resposta discreta de profundidade, sem movimentar textos e controles. Os grafismos flutuam sobre três composições: mapa do território, diversidade de produtos e rede de parceiros.
+A abertura mantém título, descrição, mapa e ações sempre visíveis em uma composição fixa. Não há carrossel, troca automática, navegação entre slides nem ocultação de seções durante a rolagem. A navegação entre páginas mantém a reinicialização dos formulários por rota, sem animação de transparência.
 
-O carrossel troca de destaque a cada sete segundos. Há setas, seleção direta de capítulos, navegação por setas do teclado, arraste horizontal com mouse ou toque e botão para pausar/retomar. Navegação manual interrompe a rotação; foco e ponteiro sobre a região suspendem a troca para permitir leitura. A rotação e os efeitos pausam ao sair da tela ou ocultar a aba. A preferência por movimento reduzido desliga os efeitos e a rotação automática, preservando todos os controles manuais.
+O movimento é decorativo: correntes suaves, folhas oscilando, grafismos flutuantes e resposta discreta de profundidade ao cursor. Os botões e cartões preservam transições de interação. O mapa continua abrindo o dashboard, com realce de cor e elevação ao passar o mouse.
 
-As seções abaixo aparecem suavemente conforme entram no campo de visão. Não foi acrescentado nenhum dado fictício.
+O controle de pausa interrompe os efeitos do fundo e dos grafismos. As animações também pausam quando a abertura sai da tela ou a aba fica oculta. A preferência por movimento reduzido desliga os efeitos. O conteúdo continua acessível em todos esses estados.
 
 ## Validar e publicar
 

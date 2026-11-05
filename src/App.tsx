@@ -46,8 +46,8 @@ export default function App() {
       <TopProgressBar />
       <DataNotice />
       <Suspense fallback={<LoadingScreen />}>
-        {/* Chave por rota: remonta e reproduz a animação de entrada a cada troca */}
-        <div key={pathname} className="animate-page-in">
+        {/* Reinicia os formulários por rota sem animar a visibilidade do conteúdo. */}
+        <div key={pathname}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/observatorio" element={<Dashboard />} />

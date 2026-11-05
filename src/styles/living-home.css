@@ -13,15 +13,12 @@
   padding-top: 48px;
   padding-bottom: 24px;
 }
-.living-slide {
+.living-layout {
   display: grid;
   grid-template-columns: 1.05fr 1fr;
   align-items: center;
   gap: 56px;
   min-height: 515px;
-}
-.living-copy {
-  animation: living-copy-in 0.7s ease-out both;
 }
 .living-kicker {
   display: flex;
@@ -44,7 +41,6 @@
 }
 .living-title {
   margin-top: 20px;
-  min-height: 245px;
   font-family: "Stack Sans Headline", sans-serif;
   font-size: clamp(2.9rem, 4.4vw, 4.1rem);
   line-height: 1.05;
@@ -58,7 +54,6 @@
 }
 .living-description {
   margin-top: 20px;
-  min-height: 84px;
   max-width: 490px;
   font-size: 16px;
   line-height: 1.75;
@@ -93,10 +88,6 @@
 }
 .living-art {
   min-width: 0;
-  touch-action: pan-y pinch-zoom;
-  user-select: none;
-  cursor: grab;
-  animation: living-art-in 0.85s ease-out both;
 }
 .living-scene {
   position: relative;
@@ -217,183 +208,6 @@
   animation: forest-river 16s ease-in-out infinite;
   pointer-events: none;
 }
-.scene-harvest {
-  position: relative;
-  height: 400px;
-}
-.harvest-nut {
-  width: 116px;
-  height: 180px;
-  left: 17%;
-  top: 55px;
-  rotate: 30deg;
-  animation-delay: -4s;
-}
-.harvest-fruit {
-  width: 190px;
-  height: 190px;
-  right: 4%;
-  top: 95px;
-  rotate: -8deg;
-}
-.harvest-green {
-  width: 120px;
-  height: 140px;
-  left: 15%;
-  bottom: 5px;
-  rotate: -20deg;
-  animation-delay: -6s;
-}
-.harvest-olive {
-  width: 100px;
-  height: 115px;
-  right: 15%;
-  bottom: -12px;
-  rotate: 20deg;
-  animation-delay: -2s;
-}
-.scene-note {
-  margin-top: 20px;
-  text-align: center;
-  font-size: 14px;
-  line-height: 1.7;
-  color: #dce6cd;
-}
-.scene-note strong {
-  color: #fff9eb;
-  font-size: 17px;
-  font-weight: 500;
-}
-.scene-network {
-  position: relative;
-  height: 395px;
-}
-.scene-network > svg {
-  position: absolute;
-  inset: 15px 0 0;
-  width: 100%;
-  height: 100%;
-  fill: none;
-  stroke: #ffbe0066;
-  stroke-width: 1;
-  stroke-dasharray: 4 10;
-}
-.scene-network-eyes {
-  width: 220px;
-  height: 75px;
-  left: calc(50% - 110px);
-  top: 155px;
-  animation-delay: -1s;
-}
-.scene-network-green {
-  width: 76px;
-  height: 90px;
-  left: 4%;
-  top: 72px;
-  rotate: -20deg;
-  animation-delay: -2s;
-}
-.scene-network-fruit {
-  width: 90px;
-  height: 90px;
-  right: 5%;
-  top: 65px;
-  rotate: 15deg;
-  animation-delay: -6s;
-}
-.scene-network-olive {
-  width: 95px;
-  height: 105px;
-  bottom: 5px;
-  left: 35%;
-  rotate: -15deg;
-  animation-delay: -4s;
-}
-.living-controls {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 28px;
-  margin-top: 35px;
-  padding-top: 22px;
-  border-top: 1px solid #fff9eb26;
-}
-.living-chapters {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
-  width: min(630px, 65%);
-}
-.living-chapters > button {
-  position: relative;
-  min-height: 48px;
-  padding-bottom: 13px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #c1d2b9;
-  text-align: left;
-  font-size: 12px;
-  transition: color 200ms;
-}
-.living-chapters > button:hover,
-.living-chapters > button.is-active {
-  color: #fff9eb;
-}
-.chapter-number {
-  color: #c1d2b9;
-  font-size: 10px;
-}
-.is-active .chapter-number {
-  color: #ffbe00;
-}
-.chapter-track {
-  position: absolute;
-  bottom: 2px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  overflow: hidden;
-  background: #fff9eb26;
-}
-.chapter-track > span {
-  display: block;
-  height: 100%;
-  background: #ffbe00;
-  transform-origin: left;
-  transform: scaleX(0);
-}
-.is-active .chapter-track > span {
-  animation: chapter-progress linear both;
-}
-.living-hero[data-motion="paused"] .is-active .chapter-track > span {
-  transform: scaleX(1);
-  animation: none;
-}
-.living-transport {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.living-arrow {
-  display: grid;
-  width: 44px;
-  height: 44px;
-  flex-shrink: 0;
-  place-items: center;
-  border: 1px solid #fff9eb4d;
-  border-radius: 50%;
-  font-size: 20px;
-  color: #fff9eb;
-  transition:
-    background 180ms,
-    color 180ms;
-}
-.living-arrow:hover {
-  background: #ffbe00;
-  color: #0c3222;
-  border-color: #ffbe00;
-}
 .living-pause {
   display: flex;
   align-items: center;
@@ -421,9 +235,6 @@
   color: #ffbe00;
   font-size: 22px;
   line-height: 1;
-}
-.living-touch-hint {
-  display: none;
 }
 .forest-atmosphere {
   position: absolute;
@@ -534,19 +345,6 @@
 .living-hero[data-motion="paused"] .atmosphere-river {
   animation-play-state: paused;
 }
-[data-reveal] {
-  transition:
-    opacity 0.7s ease-out,
-    transform 0.7s ease-out;
-}
-[data-reveal="waiting"] {
-  opacity: 0;
-  transform: translateY(24px);
-}
-[data-reveal="visible"] {
-  opacity: 1;
-  transform: none;
-}
 @keyframes forest-wind {
   0%,
   100% {
@@ -595,45 +393,15 @@
     transform: translate(50px, 20px) scale(1.1);
   }
 }
-@keyframes living-copy-in {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-@keyframes living-art-in {
-  from {
-    opacity: 0;
-    transform: translateX(32px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-@keyframes chapter-progress {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
 @media (max-width: 1023px) and (min-width: 768px) {
-  .living-slide {
+  .living-layout {
     gap: 24px;
   }
   .living-title {
     font-size: 46px;
-    min-height: 245px;
   }
   .living-description {
     font-size: 14px;
-    min-height: 120px;
   }
   .living-scene {
     min-height: 420px;
@@ -651,21 +419,6 @@
     height: 300px;
     left: -5%;
   }
-  .harvest-fruit {
-    width: 140px;
-    height: 140px;
-  }
-  .scene-network-eyes {
-    width: 180px;
-    left: calc(50% - 90px);
-  }
-  .living-chapters {
-    gap: 16px;
-  }
-  .living-chapters > button {
-    font-size: 10px;
-    gap: 7px;
-  }
 }
 @media (max-width: 767px) {
   .living-hero-inner {
@@ -674,7 +427,7 @@
     padding-top: 34px;
     padding-bottom: 22px;
   }
-  .living-slide {
+  .living-layout {
     display: contents;
   }
   .living-copy {
@@ -682,11 +435,9 @@
   }
   .living-title {
     font-size: clamp(2.6rem, 10.5vw, 3.8rem);
-    min-height: 0;
     margin-top: 18px;
   }
   .living-description {
-    min-height: 0;
     font-size: 14px;
     margin-top: 20px;
     line-height: 1.7;
@@ -708,29 +459,6 @@
     order: 2;
     margin-top: 22px;
   }
-  .living-controls {
-    order: 1;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 28px;
-    padding-top: 15px;
-  }
-  .living-chapters {
-    width: 100%;
-    gap: 16px;
-  }
-  .living-chapters > button {
-    gap: 6px;
-    font-size: 10px;
-    min-height: 44px;
-  }
-  .chapter-number {
-    font-size: 9px;
-  }
-  .living-transport {
-    width: 100%;
-    justify-content: flex-end;
-  }
   .living-pause {
     min-width: 100px;
   }
@@ -739,9 +467,6 @@
     flex-wrap: wrap;
     margin-top: 12px;
     font-size: 9px;
-  }
-  .living-touch-hint {
-    display: inline;
   }
   .living-scene {
     min-height: 350px;
@@ -792,64 +517,6 @@
     width: 460px;
     top: 120px;
   }
-  .scene-harvest,
-  .scene-network {
-    height: 285px;
-    max-width: 390px;
-    margin-inline: auto;
-  }
-  .harvest-nut {
-    width: 75px;
-    height: 120px;
-    top: 25px;
-    left: 15%;
-  }
-  .harvest-fruit {
-    width: 135px;
-    height: 135px;
-    top: 70px;
-    right: 8%;
-  }
-  .harvest-green {
-    width: 80px;
-    height: 95px;
-    left: 15%;
-    bottom: 0;
-  }
-  .harvest-olive {
-    width: 70px;
-    height: 80px;
-    right: 18%;
-    bottom: -6px;
-  }
-  .scene-note {
-    font-size: 12px;
-    margin-top: 18px;
-  }
-  .scene-note strong {
-    font-size: 15px;
-  }
-  .scene-network-eyes {
-    top: 120px;
-    width: 170px;
-    height: 56px;
-    left: calc(50% - 85px);
-  }
-  .scene-network-green {
-    width: 55px;
-    height: 65px;
-    top: 45px;
-  }
-  .scene-network-fruit {
-    width: 65px;
-    height: 65px;
-    top: 40px;
-  }
-  .scene-network-olive {
-    width: 68px;
-    height: 75px;
-    bottom: -4px;
-  }
   .forest-atmosphere {
     opacity: 0.85;
   }
@@ -866,23 +533,31 @@
   .forest-currents {
     transform: none !important;
   }
-  [data-reveal="waiting"],
-  [data-reveal="visible"] {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-  .is-active .chapter-track > span {
-    transform: scaleX(1);
-  }
 }
 
-.living-art:active {
-  cursor: grabbing;
+.living-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid #fff9eb26;
 }
-@media print {
-  [data-reveal] {
-    opacity: 1;
-    transform: none;
+.living-footer .living-motion-hint {
+  margin-top: 0;
+}
+@media (max-width: 767px) {
+  .living-footer {
+    order: 3;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .living-footer .living-motion-hint {
+    max-width: 190px;
+  }
+  .living-pause {
+    flex-shrink: 0;
   }
 }
