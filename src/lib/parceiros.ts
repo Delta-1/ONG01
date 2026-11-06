@@ -10,6 +10,7 @@ export const TIPOS_ORGANIZACAO = [
   "Outro",
 ];
 export interface DadosParceiro {
+  participacao?: "vitrine" | "dashboard" | "ambos";
   finalidade?: "vitrine" | "dashboard";
   tipo?: string;
   possui_produtos?: string;

@@ -1,3 +1,4 @@
+import { PageArtwork } from "../components/BrandArt";
 import { SectionTitle } from "../components/ui";
 import { useLegislacao } from "../hooks/useData";
 
@@ -11,6 +12,7 @@ export default function Legislacao() {
   const legislacao = useLegislacao();
   return (
     <div className="container-page py-10 sm:py-14">
+      <PageArtwork motif="semente-oliva" />
       <SectionTitle
         eyebrow="Central de legislação"
         title="Leis e princípios de defesa da sociobiodiversidade"

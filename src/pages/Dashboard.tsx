@@ -1,3 +1,4 @@
+import { PageArtwork } from "../components/BrandArt";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import AcreMap from "../components/AcreMap";
@@ -50,6 +51,7 @@ export default function Dashboard() {
   }
   return (
     <div className="container-page py-10">
+      <PageArtwork motif="semente-verde" />
       <span className="eyebrow">Observatório · Dados aprovados</span>
       <h1 className="mt-3 font-display text-3xl text-forest-900">
         Parceiros e empreendimentos do Acre
@@ -60,10 +62,10 @@ export default function Dashboard() {
         dados e colaboração. A base é um mapeamento em construção.
       </p>
       <div className="mt-5 flex flex-wrap gap-3">
-        <Link className="btn-primary" to="/formulario/dashboard">
+        <Link className="btn-primary" to="/cadastro?participacao=dashboard">
           Contribuir com dados e parceria
         </Link>
-        <Link className="btn-ghost" to="/formulario/vitrine">
+        <Link className="btn-ghost" to="/cadastro?participacao=vitrine">
           Cadastrar na vitrine
         </Link>
       </div>

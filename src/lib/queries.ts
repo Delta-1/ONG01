@@ -168,7 +168,7 @@ export async function fetchBaseObservatorio(): Promise<
   ]);
   const vinculados = new Set(parceiros.map((p) => p.empreendimento_id));
   return [
-    ...parceiros.map((p) => ({
+    ...parceiros.filter((p) => p.incluir_dashboard !== false).map((p) => ({
       id: String(p.id),
       nome: String(p.nome),
       municipioCodigo: String(p.municipio_codigo),

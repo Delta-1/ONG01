@@ -153,6 +153,7 @@ export default function Publicar() {
         </button>
       </div>
     );
+  if (!existing && !auth.isAdmin) return <Navigate to="/contribuir" replace />;
   if (done)
     return (
       <div className="container-page py-16">

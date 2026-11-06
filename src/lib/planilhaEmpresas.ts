@@ -1,11 +1,14 @@
 import type { DadosParceiro } from "./parceiros";
 import type { Empreendimento } from "../data/types";
 import { MUNICIPIOS } from "../data/municipios";
+import { nomeParticipacao } from "./participacao";
 
 export interface CadastroExportacao {
   id: string;
   status: string;
   empreendimento_id?: string | null;
+  referencia_id?: string | null;
+  created_at?: string;
   dados: DadosParceiro & {
     nome: string;
     municipio_codigo: string;
@@ -39,6 +42,11 @@ export function criarPlanilhaEmpresas(
   posts: PostExportacao[],
 ) {
   cadastros = cadastros.filter((c) => !c.dados.is_demo);
+  const aprovadosAtuais = new Map<string, CadastroExportacao>();
+  for (const cadastro of [...cadastros].sort((a, b) => (a.created_at ?? "").localeCompare(b.created_at ?? ""))) {
+    if (cadastro.status === "aprovado") aprovadosAtuais.set(cadastro.referencia_id ?? cadastro.id, cadastro);
+  }
+  cadastros = cadastros.filter((c) => c.status !== "aprovado" || aprovadosAtuais.get(c.referencia_id ?? c.id)?.id === c.id);
   const counts = new Map<string, { approved: number; pending: number }>();
   for (const p of posts) {
     const value = counts.get(p.empreendimento_id) ?? {
@@ -82,9 +90,7 @@ export function criarPlanilhaEmpresas(
     "Ano de referência",
   ];
   const extra = (d: DadosParceiro) => [
-    d.finalidade === "dashboard"
-      ? "Somente dashboard e parceria"
-      : "Vitrine e dashboard",
+    nomeParticipacao(d.participacao, d.finalidade),
     d.possui_cnpj,
     d.cnpj?.replace(/^(.{2})(.{3})(.{3})(.{4})(.{2})$/, "$1.$2.$3/$4-$5"),
     d.situacao_cnpj,
@@ -108,7 +114,7 @@ export function criarPlanilhaEmpresas(
       return [
         e.id,
         "Cadastro de empreendimento",
-        e.aprovado ? "Aprovado" : "Em análise",
+        intakeByEmpresa.get(e.id)?.participacao === "dashboard" ? "Aprovado (dashboard)" : e.aprovado ? "Aprovado" : "Em análise",
         e.nome,
         m?.nome,
         e.municipioCodigo,

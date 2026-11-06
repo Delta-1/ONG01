@@ -37,11 +37,7 @@ jobs:
         env:
           # Ajusta o base path para o subdiretório do GitHub Pages.
           VITE_BASE: /${{ github.event.repository.name }}/
-          # Credenciais do Supabase (opcional). Cadastre em
-          # Settings → Secrets and variables → Actions. Sem elas, o site
-          # funciona com os dados fictícios.
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          # O banco brasileiro é definido pela configuração pública em .env.production.
         run: npm run build
 
       - name: Fallback de SPA (404 -> index.html)

@@ -5,25 +5,25 @@
 :root {
   color-scheme: light;
 
-  /* ==== Tema padrão: Floresta ==== (valores em "R G B" para suportar alpha) */
-  --c-forest-50: 240 247 241;
-  --c-forest-100: 219 238 222;
-  --c-forest-200: 185 221 192;
-  --c-forest-300: 139 196 153;
-  --c-forest-400: 87 165 109;
-  --c-forest-500: 53 135 78;
-  --c-forest-600: 37 107 61;
-  --c-forest-700: 29 85 50;
-  --c-forest-800: 26 68 42;
-  --c-forest-900: 22 56 37;
-  --c-forest-950: 10 32 21;
-  --c-sun-400: 245 181 68;
-  --c-sun-500: 238 160 31;
-  --c-sun-600: 217 128 20;
+  /* Paleta IDV OAS: amarelo amostrado da arte (#ffbe00), cujo rótulo repete o laranja. */
+  --c-forest-50: 244 247 236;
+  --c-forest-100: 229 237 218;
+  --c-forest-200: 201 221 193;
+  --c-forest-300: 166 199 157;
+  --c-forest-400: 101 150 112;
+  --c-forest-500: 63 118 83;
+  --c-forest-600: 22 99 64;
+  --c-forest-700: 22 99 64;
+  --c-forest-800: 22 99 64;
+  --c-forest-900: 16 73 47;
+  --c-forest-950: 12 50 34;
+  --c-sun-400: 255 205 62;
+  --c-sun-500: 255 190 0;
+  --c-sun-600: 143 85 0;
 }
 
 /* ==== Tema: Oceano (turquesa) ==== */
-:root[data-tema='oceano'] {
+:root[data-tema="oceano"] {
   --c-forest-50: 240 253 250;
   --c-forest-100: 204 251 241;
   --c-forest-200: 153 246 228;
@@ -41,7 +41,7 @@
 }
 
 /* ==== Tema: Terracota (âmbar/terra) ==== */
-:root[data-tema='terracota'] {
+:root[data-tema="terracota"] {
   --c-forest-50: 251 243 236;
   --c-forest-100: 246 225 207;
   --c-forest-200: 236 194 160;
@@ -59,7 +59,7 @@
 }
 
 /* ==== Tema: Ametista (roxo) ==== */
-:root[data-tema='ametista'] {
+:root[data-tema="ametista"] {
   --c-forest-50: 250 245 255;
   --c-forest-100: 243 232 255;
   --c-forest-200: 233 213 255;
@@ -77,7 +77,7 @@
 }
 
 /* ==== Tema: Grafite (neutro elegante) ==== */
-:root[data-tema='grafite'] {
+:root[data-tema="grafite"] {
   --c-forest-50: 248 250 252;
   --c-forest-100: 241 245 249;
   --c-forest-200: 226 232 240;
@@ -114,12 +114,12 @@ body {
   @apply bg-paper text-ink font-sans antialiased;
 }
 
-/* Títulos com serifa — ar institucional/acadêmico */
+/* Tipografia original fornecida no kit IDV. */
 h1,
 h2,
 h3,
 h4 {
-  @apply font-display;
+  @apply font-display font-bold;
 }
 
 /* Scrollbar horizontal discreta para as fileiras da vitrine (estilo estante) */
@@ -137,11 +137,11 @@ h4 {
   }
   /* Cartões editoriais: cantos sóbrios, borda fina */
   .card {
-    @apply rounded-md border border-forest-100 bg-white shadow-sm;
+    @apply rounded-2xl border border-forest-200/60 bg-white shadow-sm;
   }
   /* Botões retangulares sóbrios (menos "startup", mais institucional) */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-sm px-5 py-2.5 text-sm font-semibold tracking-wide transition;
+    @apply inline-flex items-center justify-center gap-2 min-h-12 rounded-full px-6 py-3 text-sm font-semibold transition;
   }
   .btn-primary {
     @apply btn bg-forest-800 text-white hover:bg-forest-900 shadow-sm;
@@ -163,4 +163,285 @@ h4 {
   .link-underline {
     @apply underline decoration-forest-300 decoration-1 underline-offset-4 hover:decoration-forest-600;
   }
+}
+
+@font-face {
+  font-family: "Stack Sans Headline";
+  src: url("/identidade/fonts/StackSansHeadline.woff2") format("woff2");
+  font-weight: 200 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Stack Sans Text";
+  src: url("/identidade/fonts/StackSansText.woff2") format("woff2");
+  font-weight: 200 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:focus-visible {
+  outline: 3px solid #9a0318;
+  outline-offset: 4px;
+}
+::selection {
+  background: #ffbe00;
+  color: #10492f;
+}
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: #166340;
+}
+.brand-ribbon {
+  display: flex;
+  width: 100%;
+  height: 7px;
+}
+.brand-ribbon > span {
+  flex: 1;
+}
+.brand-symbol {
+  display: flex;
+  width: 66px;
+  flex-shrink: 0;
+  align-items: center;
+}
+.brand-symbol svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 2px;
+}
+.brand-symbol-light {
+  width: 80px;
+}
+.guia-cadastro { position: relative; border-radius: 18px; border: 1px solid #c7dccd; padding: 18px 20px; background: #eef4e9; color: #174630; }
+.guia-cadastro::before { content: ""; position: absolute; top: -7px; left: 29px; width: 12px; height: 12px; transform: rotate(45deg); background: #eef4e9; border-top: 1px solid #c7dccd; border-left: 1px solid #c7dccd; }
+.guia-icone { display: inline-grid; place-items: center; background: #166340; color: #fff9eb; width: 22px; height: 22px; border-radius: 50%; font-size: 13px; flex-shrink: 0; }
+.etapas-cadastro { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 10px; margin: 28px 0; }
+.etapas-cadastro li { display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: #66756b; border-top: 3px solid #dce7d9; padding-top: 12px; }
+.etapas-cadastro li > span:first-child { display: grid; place-items: center; width: 27px; height: 27px; border-radius: 50%; background: #e6eddf; font-weight: 700; }
+.etapas-cadastro li[aria-current="step"], .etapas-cadastro li[data-concluida="true"] { color: #166340; border-color: #166340; }
+.etapas-cadastro li[aria-current="step"] > span:first-child, .etapas-cadastro li[data-concluida="true"] > span:first-child { color: #fff9eb; background: #166340; }
+.escolha-participacao { display: flex; align-items: flex-start; gap: 14px; padding: 19px; border: 1px solid #d1dfcd; border-radius: 15px; cursor: pointer; transition: border-color 150ms, background-color 150ms; }
+.escolha-participacao input { margin-top: 5px; width: 18px; height: 18px; flex-shrink: 0; }
+.escolha-ativa { border-color: #166340; box-shadow: inset 0 0 0 1px #166340; background: #f2f5e9; }
+.revisao-cadastro > div { padding: 13px 0; border-bottom: 1px solid #e0e8da; overflow-wrap: anywhere; }
+.revisao-cadastro dt { font-size: 12px; color: #66756b; margin-bottom: 3px; }
+.revisao-cadastro dd { font-size: 15px; }
+.brand-pupils {
+  transform: translate(var(--eye-x, 0px), var(--eye-y, 0px));
+  transition: transform 460ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .brand-pupils {
+    transform: none;
+    transition: none;
+  }
+}
+.brand-stats {
+  background: #166340;
+  color: #fff9eb;
+}
+.brand-stat {
+  padding: 4px 24px;
+  border-left: 1px solid #fff9eb33;
+}
+.brand-stat:first-child {
+  border-left: 0;
+}
+.brand-stat > p {
+  font-family: "Stack Sans Headline", sans-serif;
+  color: #ffbe00;
+  font-size: 38px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.brand-stat > span {
+  display: block;
+  max-width: 160px;
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.brand-path {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #d3d7bc;
+  border-radius: 20px;
+  padding: 28px;
+  transition:
+    transform 200ms,
+    box-shadow 200ms;
+}
+.brand-path:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px #1663400d;
+}
+.brand-path > p {
+  flex-grow: 1;
+}
+.brand-path-olive {
+  background: #efeedb;
+}
+.brand-path-orange {
+  background: #fff0db;
+}
+.brand-path-clay {
+  background: #f5e8dd;
+}
+.brand-path-number {
+  font-size: 12px;
+  color: #166340;
+}
+.brand-showcase {
+  background: #f1efdf;
+  border-block: 1px solid #dddfc8;
+}
+.brand-text-link {
+  color: #166340;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: #a0984b;
+  text-underline-offset: 5px;
+}
+.brand-text-link:hover {
+  text-decoration-color: #9a0318;
+}
+.brand-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+  padding: 40px;
+  border: 1px solid #d4d9bf;
+  border-radius: 20px;
+  background: #fff9eb;
+}
+.brand-empty-art {
+  position: relative;
+  display: flex;
+  width: 170px;
+  height: 155px;
+  flex-shrink: 0;
+  align-items: flex-start;
+}
+.brand-empty-art > img:last-child {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  transform: rotate(25deg);
+}
+.brand-news-empty {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  border-top: 1px solid #d8dbc2;
+  border-bottom: 1px solid #d8dbc2;
+  padding: 32px 0;
+}
+.brand-participate {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 48px;
+  overflow: hidden;
+  padding: 48px;
+  border-radius: 24px;
+  background: #166340;
+  color: #fff9eb;
+}
+.brand-participate-river {
+  position: absolute;
+  z-index: -1;
+  width: 800px;
+  max-width: none;
+  right: -180px;
+  bottom: -220px;
+  opacity: 0.12;
+  transform: rotate(-24deg);
+}
+.page-artwork {
+  position: relative;
+  display: flex;
+  height: 115px;
+  align-items: center;
+  justify-content: flex-end;
+  overflow: hidden;
+  border-radius: 20px;
+  margin-bottom: 28px;
+  background: #f1efdf;
+}
+.page-artwork > img:first-child {
+  position: absolute;
+  right: 10%;
+  width: 95px;
+  height: 95px;
+  transform: rotate(18deg);
+  z-index: 1;
+}
+.page-artwork > img:last-child {
+  width: 650px;
+  max-width: none;
+  position: absolute;
+  right: 15%;
+  transform: rotate(-8deg);
+}
+@media (max-width: 767px) {
+  .brand-stat {
+    padding-inline: 16px;
+  }
+  .brand-stat:nth-child(odd) {
+    border-left: 0;
+  }
+  .brand-path {
+    padding: 24px;
+  }
+  .brand-empty {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 28px;
+  }
+  .brand-empty-art {
+    width: 140px;
+    height: 125px;
+  }
+  .brand-empty-art > img:first-child {
+    width: 80px;
+    height: 80px;
+  }
+  .brand-news-empty {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+  .brand-participate {
+    grid-template-columns: 1fr;
+    gap: 28px;
+    padding: 28px;
+  }
+  .brand-symbol {
+    width: 48px;
+  }
+  .page-artwork {
+    height: 90px;
+  }
+}
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 100;
+  transform: translateY(-180%);
+  background: #fff9eb;
+  color: #166340;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.skip-link:focus {
+  transform: translateY(0);
 }

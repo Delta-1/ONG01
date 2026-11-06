@@ -30,3 +30,8 @@ pnpm-debug.log*
 
 # Supabase CLI state
 supabase/.temp/
+
+# Entradas locais de teste nunca são publicadas.
+public/_qa-*.html
+
+.test-build/

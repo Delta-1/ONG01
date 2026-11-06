@@ -6,6 +6,7 @@ import { MUNICIPIOS } from "../data/municipios";
 import type { DadosParceiro } from "../lib/parceiros";
 import { readAllPages } from "../lib/pagination";
 import { Message, TextField } from "./FormUI";
+import { nomeParticipacao } from "../lib/participacao";
 interface Item {
   id: string;
   dados: DadosParceiro & {
@@ -25,6 +26,7 @@ interface Item {
   created_at: string;
   parecer: string | null;
   empreendimento_id: string | null;
+  imagem_url?: string;
 }
 export default function CadastrosRapidosAdmin({
   onApproved,
@@ -49,12 +51,17 @@ export default function CadastrosRapidosAdmin({
         .order("id")
         .range(from, to),
     );
-    return data as Item[];
+    return Promise.all((data as Item[]).map(async (item) => {
+      const path = (item.dados as DadosParceiro & { imagem_path?: string }).imagem_path;
+      if (!path) return item;
+      const { data: image } = await db().storage.from("publicacoes").createSignedUrl(path, 900);
+      return { ...item, imagem_url: image?.signedUrl };
+    }));
   }, filter);
-  const link = `${location.origin}${import.meta.env.BASE_URL}formulario`;
+  const link = `${location.origin}${import.meta.env.BASE_URL}cadastro`;
   async function copy(path: string) {
     try {
-      await navigator.clipboard.writeText(`${link}/${path}`);
+      await navigator.clipboard.writeText(`${link}?participacao=${path}`);
       setCopied(path);
     } catch {
       setError("Selecione e copie o link no campo acima.");
@@ -74,7 +81,7 @@ export default function CadastrosRapidosAdmin({
       setMessage(
         approve
           ? "Cadastro aprovado para a finalidade escolhida. Os indicadores foram atualizados; somente cadastros de vitrine geram perfil e publicação."
-          : "Cadastro não aprovado. A justificativa foi registrada para a equipe.",
+          : "Ajustes solicitados. A justificativa está disponível no painel do participante.",
       );
       setReview("");
       setNote("");
@@ -88,11 +95,9 @@ export default function CadastrosRapidosAdmin({
   }
   return (
     <section className="card mt-6 p-5 sm:p-6">
-      <h2 className="font-display text-2xl">Cadastros do formulário rápido</h2>
+      <h2 className="font-display text-2xl">Cadastros e atualizações para analisar</h2>
       <p className="mt-2 text-sm text-forest-600">
-        Compartilhe o link conforme a finalidade. Os dois formulários funcionam
-        sem conta, recebem dados reais e passam por aprovação. O parceiro sem
-        vitrine contribui somente para o dashboard.
+        Aqui chegam os dados enviados pelos empreendedores e os cadastros da equipe. Confira a finalidade, revise as informações e aprove ou solicite ajustes. Atualizações só substituem os dados públicos após aprovação.
       </p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         {[
@@ -108,19 +113,22 @@ export default function CadastrosRapidosAdmin({
               <input
                 className="mt-2 w-full rounded border border-forest-200 p-2 text-xs"
                 readOnly
-                value={`${link}/${path}`}
+                value={`${link}?participacao=${path}`}
                 onFocus={(e) => e.target.select()}
               />
             </label>
             <button className="btn-primary" onClick={() => void copy(path)}>
               {copied === path ? "Link copiado" : "Copiar link"}
             </button>
-            <Link className="ml-3 text-sm underline" to={`/formulario/${path}`}>
+            <Link className="ml-3 text-sm underline" to={`/cadastro?participacao=${path}`}>
               Abrir
             </Link>
           </div>
         ))}
       </div>
+      <p className="mt-3 text-sm text-forest-600">
+        A equipe pode preencher por uma organização usando a <Link to="/formulario" className="underline">captação assistida sem conta</Link>.
+      </p>
       <div className="my-5 flex flex-wrap gap-2">
         {[
           ["pendente", "Para aprovar"],
@@ -163,9 +171,7 @@ export default function CadastrosRapidosAdmin({
                   {i.dados.nome}
                 </h3>
                 <p className="mt-2 font-semibold text-sm">
-                  {i.dados.finalidade === "dashboard"
-                    ? "Somente dashboard e parceria"
-                    : "Vitrine e dashboard"}
+                  {nomeParticipacao(i.dados.participacao, i.dados.finalidade)}
                 </p>
                 <p className="mt-2 text-sm text-forest-600">
                   {
@@ -179,6 +185,7 @@ export default function CadastrosRapidosAdmin({
                 <p className="mt-3 whitespace-pre-wrap break-words">
                   {i.dados.historia}
                 </p>
+                {i.imagem_url && <img src={i.imagem_url} alt={`Foto enviada para análise por ${i.dados.nome}`} className="mt-4 max-h-64 w-full rounded-lg object-contain" />}
                 <p className="mt-3 text-sm">
                   Produtos: {i.dados.produtos.join(", ")}
                 </p>

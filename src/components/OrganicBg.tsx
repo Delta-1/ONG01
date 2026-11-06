@@ -1,46 +1,66 @@
-/** Fundo orgânico animado — folhas, cipós e rios estilizados (identidade da floresta). */
+import type { CSSProperties } from "react";
+import { BrandArt } from "./BrandArt";
+
+const LEAVES = [
+  [5, 18, 22, 0, 16],
+  [15, 65, 15, -7, 22],
+  [28, 8, 12, -4, 19],
+  [42, 82, 25, -12, 25],
+  [53, 24, 16, -3, 21],
+  [62, 72, 14, -9, 17],
+  [72, 12, 27, -11, 23],
+  [82, 58, 16, -6, 19],
+  [92, 26, 20, -13, 26],
+  [34, 49, 12, -8, 24],
+  [9, 91, 18, -2, 20],
+  [95, 88, 25, -5, 18],
+];
+
+/** Rios, folhas e sementes em camadas: brisa contínua com leve resposta ao cursor. */
 export default function OrganicBg() {
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-      <svg className="absolute inset-0 h-full w-full" preserveAspectRatio="xMidYMid slice" viewBox="0 0 800 600">
-        <defs>
-          <radialGradient id="glow" cx="30%" cy="20%" r="80%">
-            <stop offset="0%" stopColor="#57a56d" stopOpacity="0.35" />
-            <stop offset="100%" stopColor="#0a2015" stopOpacity="0" />
-          </radialGradient>
-        </defs>
-        <rect width="800" height="600" fill="url(#glow)" />
-        {/* rios sinuosos */}
-        <path
-          className="animate-drift-slow"
-          d="M-50 120 C 150 80, 250 220, 450 180 S 780 260, 900 200"
-          fill="none"
-          stroke="#38b8c2"
-          strokeWidth="2.5"
-          strokeOpacity="0.25"
-        />
-        <path
-          className="animate-drift-slow"
-          style={{ animationDelay: '3s' }}
-          d="M-50 460 C 180 500, 300 360, 520 420 S 760 380, 900 440"
-          fill="none"
-          stroke="#38b8c2"
-          strokeWidth="2"
-          strokeOpacity="0.2"
-        />
-        {/* folhas flutuantes */}
-        {[
-          { x: 120, y: 420, s: 1.4, d: '0s' },
-          { x: 640, y: 130, s: 1.1, d: '1.5s' },
-          { x: 520, y: 480, s: 0.9, d: '2.5s' },
-          { x: 700, y: 360, s: 1.2, d: '0.8s' },
-        ].map((l, i) => (
-          <g key={i} className="animate-float" style={{ animationDelay: l.d }} transform={`translate(${l.x} ${l.y}) scale(${l.s})`}>
-            <path d="M0 0 C 26 -8, 44 -30, 40 -56 C 14 -48, -4 -26, 0 0 Z" fill="#8bc499" fillOpacity="0.28" />
-            <path d="M2 -4 C 12 -18, 24 -32, 36 -48" stroke="#dbeede" strokeWidth="1.2" strokeOpacity="0.4" fill="none" />
-          </g>
-        ))}
+    <div className="forest-atmosphere" aria-hidden="true">
+      <div className="forest-halo forest-halo-one" />
+      <div className="forest-halo forest-halo-two" />
+      <svg
+        className="forest-currents"
+        viewBox="0 0 1440 800"
+        preserveAspectRatio="xMidYMid slice"
+      >
+        <g className="wind-current wind-current-one">
+          <path d="M-160 240C170 80 340 440 690 240S1200 100 1620 330" />
+          <path d="M-160 256C170 96 340 456 690 256S1200 116 1620 346" />
+        </g>
+        <g className="wind-current wind-current-two">
+          <path d="M-150 630C200 770 440 370 760 580S1200 740 1620 490" />
+        </g>
       </svg>
+      <div className="wind-parallax">
+        {LEAVES.map(([x, y, size, delay, duration], i) => (
+          <span
+            key={i}
+            className={`wind-leaf wind-leaf-${i % 3}`}
+            style={
+              {
+                left: `${x}%`,
+                top: `${y}%`,
+                width: size,
+                height: size * 1.8,
+                "--leaf-delay": `${delay}s`,
+                "--leaf-duration": `${duration}s`,
+                "--leaf-turn": `${i * 27 - 70}deg`,
+              } as CSSProperties
+            }
+          >
+            <svg viewBox="0 0 32 52">
+              <path d="M3 49C-3 19 9 3 28 0C36 25 25 45 3 49Z" />
+              <path d="M4 46L26 5" />
+            </svg>
+          </span>
+        ))}
+      </div>
+      <BrandArt motif="rio" className="atmosphere-river" />
+      <span className="atmosphere-grain" />
     </div>
-  )
+  );
 }

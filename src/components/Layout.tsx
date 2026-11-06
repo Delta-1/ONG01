@@ -11,8 +11,8 @@
 import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import type { ReactNode } from "react";
-import LogoPlaceholder from "./LogoPlaceholder";
-import { LeafMark } from "./Leaf";
+import BrandSignature from "./BrandSignature";
+import { BrandRibbon } from "./BrandArt";
 import { useAuth } from "../contexts/AuthContext";
 import { useEstrutura } from "../lib/estruturas";
 
@@ -24,36 +24,6 @@ const NAV = [
   { to: "/legislacao", label: "Legislação" },
   { to: "/sobre", label: "Sobre" },
 ];
-
-function InstagramIcon({ className = "h-4 w-4" }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-    >
-      <rect x="3" y="3" width="18" height="18" rx="5" />
-      <circle cx="12" cy="12" r="4" />
-      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-function YoutubeIcon({ className = "h-4 w-4" }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-    >
-      <rect x="2.5" y="5.5" width="19" height="13" rx="4" />
-      <path d="M10 9.5l5 2.5-5 2.5v-5Z" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
 
 /** Gif pequeno da marca no rodapé (com fallback se o arquivo não existir). */
 function MarcaBrasil() {
@@ -87,10 +57,10 @@ function BrandLogo({ stacked = false }: { stacked?: boolean }) {
           : "flex items-center gap-3"
       }
     >
-      <LogoPlaceholder />
+      <BrandSignature />
       <span className="leading-tight">
         <span
-          className={`block font-display font-700 text-ink ${stacked ? "text-xl" : "text-lg sm:text-xl"}`}
+          className={`block font-display font-700 text-ink ${stacked ? "text-xl" : "text-base sm:text-xl"}`}
         >
           Observatório Acriano
         </span>
@@ -176,33 +146,18 @@ function AuthLinks({ tone = "dark" }: { tone?: "dark" | "light" }) {
 
 function UtilityBar() {
   return (
-    <div className="bg-forest-950 text-forest-100">
-      <div className="container-page flex h-9 items-center justify-between text-[12px]">
-        <span className="hidden items-center gap-2 sm:flex">
-          <LeafMark className="h-3.5 w-3.5 text-forest-400" />
-          Estado do Acre · Amazônia
+    <div className="bg-brand-green text-brand-cream">
+      <div className="container-page flex min-h-9 items-center justify-between gap-4 py-2 text-[12px]">
+        <span className="hidden sm:inline">
+          Feito de floresta, pessoas e histórias.
         </span>
-        <div className="flex items-center gap-4">
-          <a
-            href="https://instagram.com"
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center gap-1 hover:text-white"
-          >
-            <InstagramIcon className="h-3.5 w-3.5" />{" "}
-            <span className="hidden sm:inline">Instagram</span>
-          </a>
-          <a
-            href="https://youtube.com"
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center gap-1 hover:text-white"
-          >
-            <YoutubeIcon className="h-3.5 w-3.5" />{" "}
-            <span className="hidden sm:inline">YouTube</span>
-          </a>
-          <AuthLinks tone="dark" />
-        </div>
+        <Link
+          to="/cadastro"
+          className="underline underline-offset-4 hover:text-brand-yellow"
+        >
+          Contribua com o mapeamento ↗
+        </Link>
+        <AuthLinks tone="dark" />
       </div>
     </div>
   );
@@ -219,7 +174,8 @@ function HamburgerButton({
     <button
       className="grid h-10 w-10 place-items-center rounded-sm border border-forest-300 text-forest-800 lg:hidden"
       onClick={onClick}
-      aria-label="Abrir menu"
+      aria-label={open ? "Fechar menu" : "Abrir menu"}
+      aria-expanded={open}
     >
       <svg
         viewBox="0 0 24 24"
@@ -244,7 +200,25 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
     <div className="border-t border-forest-100 bg-paper lg:hidden">
       <div className="container-page flex flex-col gap-1 py-3">
         <NavLinks vertical onNavigate={onClose} />
-        <Link to="/cadastro" className="btn-primary mt-2" onClick={onClose}>
+        <Link
+          to="/cadastro"
+          className="rounded-md px-3 py-2 text-sm font-medium text-forest-700"
+          onClick={onClose}
+        >
+          Contribuir com dados
+        </Link>
+        <Link
+          to="/entrar"
+          className="rounded-md px-3 py-2 text-sm font-medium text-forest-700"
+          onClick={onClose}
+        >
+          Entrar na minha conta
+        </Link>
+        <Link
+          to="/cadastro"
+          className="btn-primary mt-2"
+          onClick={onClose}
+        >
           Cadastre seu negócio
         </Link>
       </div>
@@ -254,11 +228,12 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
 
 function SiteFooter() {
   return (
-    <footer className="mt-20 border-t-4 border-sun-500 bg-forest-950 text-forest-100">
+    <footer className="mt-16 bg-forest-950 text-forest-100">
+      <BrandRibbon />
       <div className="container-page grid gap-8 py-14 md:grid-cols-4">
         <div className="md:col-span-2">
           <div className="flex items-center gap-3 text-white">
-            <LogoPlaceholder variant="light" />
+            <BrandSignature variant="light" />
             <span className="font-display text-lg font-700">
               Observatório Acriano
             </span>
@@ -312,24 +287,12 @@ function SiteFooter() {
             © {new Date().getFullYear()} Observatório Acriano da
             Sócio-bioeconomia.
           </span>
-          <div className="flex items-center gap-4">
-            <a
-              href="https://instagram.com"
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-1 hover:text-white"
-            >
-              <InstagramIcon /> Instagram
-            </a>
-            <a
-              href="https://youtube.com"
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-1 hover:text-white"
-            >
-              <YoutubeIcon /> YouTube
-            </a>
-          </div>
+          <Link
+            to="/cadastro"
+            className="text-forest-200 hover:text-white"
+          >
+            Contribua com o mapeamento ↗
+          </Link>
         </div>
         <div className="container-page flex justify-center pb-6">
           <MarcaBrasil />
@@ -362,7 +325,9 @@ function ShellClassica({ children }: { children: ReactNode }) {
         </div>
         <MobileMenu open={open} onClose={() => setOpen(false)} />
       </header>
-      <main className="flex-1">{children}</main>
+      <main id="conteudo" tabIndex={-1} className="flex-1">
+        {children}
+      </main>
       <SiteFooter />
     </div>
   );
@@ -391,7 +356,9 @@ function ShellCentral({ children }: { children: ReactNode }) {
         </div>
         <MobileMenu open={open} onClose={() => setOpen(false)} />
       </header>
-      <main className="flex-1">{children}</main>
+      <main id="conteudo" tabIndex={-1} className="flex-1">
+        {children}
+      </main>
       <SiteFooter />
     </div>
   );
@@ -422,7 +389,9 @@ function ShellMinimalista({ children }: { children: ReactNode }) {
         </div>
         <MobileMenu open={open} onClose={() => setOpen(false)} />
       </header>
-      <main className="flex-1">{children}</main>
+      <main id="conteudo" tabIndex={-1} className="flex-1">
+        {children}
+      </main>
       <SiteFooter />
     </div>
   );
@@ -446,24 +415,6 @@ function ShellLateral({ children }: { children: ReactNode }) {
           <div className="text-sm">
             <AuthLinks tone="light" />
           </div>
-          <div className="mt-3 flex items-center gap-4 text-forest-500">
-            <a
-              href="https://instagram.com"
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-ink"
-            >
-              <InstagramIcon />
-            </a>
-            <a
-              href="https://youtube.com"
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-ink"
-            >
-              <YoutubeIcon />
-            </a>
-          </div>
         </div>
       </aside>
 
@@ -477,7 +428,9 @@ function ShellLateral({ children }: { children: ReactNode }) {
           </div>
           <MobileMenu open={open} onClose={() => setOpen(false)} />
         </header>
-        <main className="flex-1">{children}</main>
+        <main id="conteudo" tabIndex={-1} className="flex-1">
+          {children}
+        </main>
         <SiteFooter />
       </div>
     </div>
@@ -547,28 +500,15 @@ function ShellImersiva({ children }: { children: ReactNode }) {
               Cadastre seu negócio
             </Link>
           </nav>
-          <div className="flex items-center justify-center gap-6 pb-8 text-white/70">
-            <a
-              href="https://instagram.com"
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-white"
-            >
-              <InstagramIcon />
-            </a>
-            <a
-              href="https://youtube.com"
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-white"
-            >
-              <YoutubeIcon />
-            </a>
+          <div className="flex justify-center pb-8">
+            <AuthLinks tone="dark" />
           </div>
         </div>
       )}
 
-      <main className="flex-1">{children}</main>
+      <main id="conteudo" tabIndex={-1} className="flex-1">
+        {children}
+      </main>
       <SiteFooter />
     </div>
   );
@@ -585,5 +525,12 @@ const SHELLS: Record<string, (p: { children: ReactNode }) => JSX.Element> = {
 export default function Layout({ children }: { children: ReactNode }) {
   const estrutura = useEstrutura();
   const Shell = SHELLS[estrutura] ?? ShellClassica;
-  return <Shell>{children}</Shell>;
+  return (
+    <>
+      <a href="#conteudo" className="skip-link">
+        Pular para o conteúdo
+      </a>
+      <Shell>{children}</Shell>
+    </>
+  );
 }

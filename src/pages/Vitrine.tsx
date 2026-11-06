@@ -1,28 +1,44 @@
-import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { SectionTitle } from '../components/ui'
-import { useEmpreendimentos, useMunicipios } from '../hooks/useData'
-import type { Empreendimento, Municipio } from '../data/types'
+import { BrandArt, PageArtwork } from "../components/BrandArt";
+import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import { SectionTitle } from "../components/ui";
+import { useEmpreendimentos, useMunicipios } from "../hooks/useData";
+import type { Empreendimento, Municipio } from "../data/types";
 
-function Card({ e, byCode }: { e: Empreendimento; byCode: Record<string, Municipio> }) {
-  const mun = byCode[e.municipioCodigo]
+function Card({
+  e,
+  byCode,
+}: {
+  e: Empreendimento;
+  byCode: Record<string, Municipio>;
+}) {
+  const mun = byCode[e.municipioCodigo];
   return (
     <Link
       to={`/vitrine/${e.id}`}
       className="group w-64 shrink-0 overflow-hidden rounded-2xl border border-forest-100 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
     >
-      <div className="relative h-36" style={{ background: `linear-gradient(135deg, ${e.cor}, #0a2015)` }}>
+      <div
+        className="relative h-36"
+        style={{ background: `linear-gradient(135deg, ${e.cor}, #0a2015)` }}
+      >
         <span className="absolute left-3 top-3 rounded-full bg-white/90 px-2.5 py-0.5 text-[11px] font-600 text-forest-700">
           {e.categoria}
         </span>
       </div>
       <div className="p-4">
-        <h3 className="font-display font-700 text-forest-800 group-hover:text-forest-900">{e.nome}</h3>
-        <p className="mt-0.5 text-xs text-forest-500">{mun?.nome} · {mun?.regiao}</p>
-        <p className="mt-2 line-clamp-2 text-sm text-forest-600">{e.historia}</p>
+        <h3 className="font-display font-700 text-forest-800 group-hover:text-forest-900">
+          {e.nome}
+        </h3>
+        <p className="mt-0.5 text-xs text-forest-500">
+          {mun?.nome} · {mun?.regiao}
+        </p>
+        <p className="mt-2 line-clamp-2 text-sm text-forest-600">
+          {e.historia}
+        </p>
       </div>
     </Link>
-  )
+  );
 }
 
 function Fileira({
@@ -30,26 +46,28 @@ function Fileira({
   itens,
   byCode,
 }: {
-  titulo: string
-  itens: Empreendimento[]
-  byCode: Record<string, Municipio>
+  titulo: string;
+  itens: Empreendimento[];
+  byCode: Record<string, Municipio>;
 }) {
   return (
     <div>
-      <h3 className="mb-3 font-display text-lg font-700 text-forest-800">{titulo}</h3>
+      <h3 className="mb-3 font-display text-lg font-700 text-forest-800">
+        {titulo}
+      </h3>
       <div className="no-scrollbar flex gap-4 overflow-x-auto pb-2">
         {itens.map((e) => (
           <Card key={e.id} e={e} byCode={byCode} />
         ))}
       </div>
     </div>
-  )
+  );
 }
 
 export default function Vitrine() {
-  const [busca, setBusca] = useState('')
-  const empreendimentos = useEmpreendimentos()
-  const { byCode } = useMunicipios()
+  const [busca, setBusca] = useState("");
+  const empreendimentos = useEmpreendimentos();
+  const { byCode } = useMunicipios();
 
   const filtrados = useMemo(
     () =>
@@ -58,52 +76,94 @@ export default function Vitrine() {
           e.aprovado &&
           (e.nome.toLowerCase().includes(busca.toLowerCase()) ||
             e.categoria.toLowerCase().includes(busca.toLowerCase()) ||
-            e.produtos.some((p) => p.toLowerCase().includes(busca.toLowerCase()))),
+            e.produtos.some((p) =>
+              p.toLowerCase().includes(busca.toLowerCase()),
+            )),
       ),
     [busca, empreendimentos],
-  )
+  );
 
   const porCategoria = useMemo(() => {
-    const acc: Record<string, Empreendimento[]> = {}
+    const acc: Record<string, Empreendimento[]> = {};
     filtrados.forEach((e) => {
-      ;(acc[e.categoria] ??= []).push(e)
-    })
-    return Object.entries(acc)
-  }, [filtrados])
+      (acc[e.categoria] ??= []).push(e);
+    });
+    return Object.entries(acc);
+  }, [filtrados]);
 
   return (
     <div className="container-page py-10 sm:py-14">
-      <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+      <PageArtwork motif="fruto" />
+      <div className="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
         <SectionTitle
           eyebrow="Vitrine virtual"
           title="Empreendimentos da sociobiodiversidade"
           desc="Negócios da floresta, aprovados pela curadoria do Observatório. Conheça histórias, produtos e formas de contato."
         />
-        <Link className="btn-primary" to="/formulario/vitrine">Cadastrar na vitrine</Link>
-        <div className="relative sm:w-72">
-          <input
-            value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-            placeholder="Buscar por nome, produto…"
-            className="w-full rounded-full border border-forest-200 bg-white py-2.5 pl-10 pr-4 text-sm outline-none focus:border-forest-400 focus:ring-2 focus:ring-forest-100"
-          />
-          <svg viewBox="0 0 24 24" className="absolute left-3.5 top-3 h-4 w-4 text-forest-400" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="7" />
-            <path d="M21 21l-4-4" strokeLinecap="round" />
-          </svg>
+        <div className="flex flex-col gap-4">
+          <Link className="btn-primary" to="/cadastro?participacao=vitrine">
+            Cadastrar na vitrine
+          </Link>
+          <div className="relative sm:w-72">
+            <input
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+              aria-label="Buscar empreendimentos por nome ou produto"
+              placeholder="Buscar por nome, produto…"
+              className="w-full rounded-full border border-forest-200 bg-white py-2.5 pl-10 pr-4 text-sm outline-none focus:border-forest-400 focus:ring-2 focus:ring-forest-100"
+            />
+            <svg
+              viewBox="0 0 24 24"
+              className="absolute left-3.5 top-3 h-4 w-4 text-forest-400"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <circle cx="11" cy="11" r="7" />
+              <path d="M21 21l-4-4" strokeLinecap="round" />
+            </svg>
+          </div>
         </div>
       </div>
 
       <div className="mt-10 space-y-10">
         {porCategoria.length === 0 && (
-          <p className="rounded-xl border border-dashed border-forest-200 bg-forest-50 p-8 text-center text-forest-500">
-            Nenhum empreendimento encontrado para “{busca}”.
-          </p>
+          <div className="brand-empty">
+            <div className="brand-empty-art">
+              <BrandArt motif="fruto" className="h-24 w-24" />
+              <BrandArt motif="semente-verde" className="h-20 w-20" />
+            </div>
+            <div>
+              <h2 className="font-display text-2xl font-bold text-forest-900">
+                {busca
+                  ? "Vamos tentar outra busca?"
+                  : "Uma vitrine feita de histórias reais."}
+              </h2>
+              <p className="mt-3 max-w-lg text-forest-700">
+                {busca
+                  ? `Nenhum empreendimento encontrado para “${busca}”. Tente outro nome ou produto.`
+                  : "A coleta está começando. Os empreendimentos aparecem aqui após a aprovação da equipe. O seu pode fazer parte."}
+              </p>
+              {busca ? (
+                <button
+                  type="button"
+                  className="btn-ghost mt-5"
+                  onClick={() => setBusca("")}
+                >
+                  Limpar busca
+                </button>
+              ) : (
+                <Link to="/cadastro?participacao=vitrine" className="btn-primary mt-5">
+                  Quero participar da vitrine ↗
+                </Link>
+              )}
+            </div>
+          </div>
         )}
         {porCategoria.map(([cat, itens]) => (
           <Fileira key={cat} titulo={cat} itens={itens} byCode={byCode} />
         ))}
       </div>
     </div>
-  )
+  );
 }

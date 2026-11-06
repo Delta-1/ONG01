@@ -1,3 +1,4 @@
+import { PageArtwork } from "../components/BrandArt";
 import { SectionTitle } from "../components/ui";
 import { useNoticias } from "../hooks/useData";
 import { fmtData } from "../lib/format";
@@ -6,6 +7,7 @@ export default function Noticias() {
   const NOTICIAS = useNoticias();
   return (
     <div className="container-page py-10 sm:py-14">
+      <PageArtwork motif="castanha" />
       <SectionTitle
         eyebrow="Portal institucional"
         title="Notícias e atualizações"

@@ -24,6 +24,7 @@ const Publicar = lazy(() => import("./pages/Publicar"));
 const RecuperarSenha = lazy(() => import("./pages/RecuperarSenha"));
 const RedefinirSenha = lazy(() => import("./pages/RedefinirSenha"));
 const FormularioRapido = lazy(() => import("./pages/FormularioRapido"));
+const Contribuir = lazy(() => import("./pages/Contribuir"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 export default function App() {
@@ -46,8 +47,8 @@ export default function App() {
       <TopProgressBar />
       <DataNotice />
       <Suspense fallback={<LoadingScreen />}>
-        {/* Chave por rota: remonta e reproduz a animação de entrada a cada troca */}
-        <div key={pathname} className="animate-page-in">
+        {/* Reinicia os formulários por rota sem animar a visibilidade do conteúdo. */}
+        <div key={pathname}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/observatorio" element={<Dashboard />} />
@@ -70,6 +71,7 @@ export default function App() {
             <Route path="/recuperar-senha" element={<RecuperarSenha />} />
             <Route path="/redefinir-senha" element={<RedefinirSenha />} />
             <Route path="/painel" element={<Painel />} />
+            <Route path="/contribuir" element={<Contribuir />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

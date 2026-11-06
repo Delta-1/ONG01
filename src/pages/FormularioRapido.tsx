@@ -1,6 +1,8 @@
+import { novoId } from "../lib/uuid";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Field, TextField, Message, inputClass } from "../components/FormUI";
+import { PageArtwork } from "../components/BrandArt";
 import { MUNICIPIOS } from "../data/municipios";
 import { db, mensagemErro } from "../lib/queries";
 import { TIPOS_ORGANIZACAO } from "../lib/parceiros";
@@ -39,7 +41,7 @@ export default function FormularioRapido() {
       : "vitrine",
   };
   const [form, setForm] = useState(initial),
-    [id, setId] = useState(() => crypto.randomUUID()),
+    [id, setId] = useState(() => novoId()),
     [consent, setConsent] = useState(false),
     [website, setWebsite] = useState(""),
     [busy, setBusy] = useState(false),
@@ -119,7 +121,7 @@ export default function FormularioRapido() {
             onClick={() => {
               setForm(initial);
               setConsent(false);
-              setId(crypto.randomUUID());
+              setId(novoId());
               setSent(false);
             }}
           >
@@ -134,14 +136,17 @@ export default function FormularioRapido() {
   return (
     <div className="container-page py-10">
       <div className="mx-auto max-w-2xl">
+        <PageArtwork
+          motif={form.finalidade === "dashboard" ? "semente-oliva" : "fruto"}
+        />
         <span className="eyebrow">Levantamento de empreendimentos do Acre</span>
         <h1 className="mt-3 font-display text-3xl text-forest-900">
           Cadastro de parceiros do Observatório
         </h1>
         <p className="mt-3 text-forest-600">
-          Preencha os dados do negócio. Não precisa criar conta. Tudo será
-          enviado para análise do administrador antes de aparecer no site.
+          Formulário para a equipe cadastrar organizações durante a coleta. Tudo será enviado para análise da ONG antes de aparecer no site.
         </p>
+        <p className="mt-3 rounded-xl bg-forest-50 p-4 text-sm">Você é o responsável pela organização? <Link className="font-semibold underline" to="/cadastro">Crie seu acesso rápido</Link> para preencher e acompanhar a análise pelo seu painel.</p>
         <form className="card mt-6 space-y-5 p-5 sm:p-8" onSubmit={submit}>
           <fieldset className="space-y-3 rounded-xl bg-forest-50 p-4">
             <legend className="font-semibold">

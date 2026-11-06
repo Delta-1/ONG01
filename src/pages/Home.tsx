@@ -1,8 +1,7 @@
 import { Link } from "react-router-dom";
-import OrganicBg from "../components/OrganicBg";
-import AcreMapHero from "../components/AcreMapHero";
+import ForestHero from "../components/ForestHero";
 import { SectionTitle } from "../components/ui";
-import { LeafMark, FloatingLeaf } from "../components/Leaf";
+import { BrandArt } from "../components/BrandArt";
 import {
   useMunicipios,
   useEmpreendimentos,
@@ -11,7 +10,7 @@ import {
 import { fmtInt, fmtData } from "../lib/format";
 
 export default function Home() {
-  const { municipios, totais: t } = useMunicipios();
+  const { municipios, totais } = useMunicipios();
   const empreendimentos = useEmpreendimentos();
   const noticias = useNoticias();
   const destaques = [...empreendimentos]
@@ -19,59 +18,16 @@ export default function Home() {
     .slice(0, 3);
 
   return (
-    <div>
-      {/* HERO editorial + mapa */}
-      <section className="relative overflow-hidden bg-forest-950 text-white">
-        <OrganicBg />
-        <div className="container-page relative grid items-center gap-12 py-16 sm:py-24 lg:grid-cols-2">
-          <div className="animate-fade-up">
-            <p className="eyebrow !text-forest-300">
-              Observatório · Acre · Amazônia
-            </p>
-            <h1 className="mt-4 font-display text-4xl font-700 leading-[1.1] sm:text-5xl">
-              O valor da floresta em pé,
-              <span className="block text-forest-300">
-                em dados e histórias.
-              </span>
-            </h1>
-            <div className="mt-5 h-px w-16 bg-sun-500" />
-            <p className="mt-5 max-w-xl leading-relaxed text-forest-100/90">
-              Um centro público de referência sobre a sócio-bioeconomia acriana:
-              reúne os dados dos empreendimentos da floresta, a legislação de
-              proteção e uma vitrine viva dos produtos da sociobiodiversidade do
-              Acre.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                to="/observatorio"
-                className="btn bg-white text-forest-900 hover:bg-forest-50"
-              >
-                Explorar o dashboard
-              </Link>
-              <Link
-                to="/vitrine"
-                className="btn border border-forest-500 text-white hover:bg-forest-900"
-              >
-                Ver a vitrine
-              </Link>
-            </div>
-          </div>
+    <div className="brand-home">
+      <ForestHero />
 
-          {/* Mapa interativo do Acre na tela inicial */}
-          <div
-            className="animate-fade-up rounded-lg bg-forest-900/40 p-6 backdrop-blur"
-            style={{ animationDelay: "0.15s" }}
-          >
-            <AcreMapHero />
-          </div>
-        </div>
-      </section>
-
-      {/* Faixa de indicadores (estilo institucional) */}
-      <section className="border-b border-forest-100 bg-white">
-        <div className="container-page grid grid-cols-2 divide-forest-100 py-10 sm:grid-cols-4 sm:divide-x">
+      <section className="brand-stats" aria-label="Retrato do mapeamento">
+        <div className="container-page grid grid-cols-2 gap-y-6 py-9 sm:grid-cols-4">
           {[
-            { v: fmtInt(t.empreendimentos), l: "empreendimentos mapeados" },
+            {
+              v: fmtInt(totais.empreendimentos),
+              l: "empreendimentos mapeados",
+            },
             { v: "22", l: "municípios no mapa" },
             {
               v: String(new Set(empreendimentos.map((e) => e.categoria)).size),
@@ -84,179 +40,241 @@ export default function Home() {
               l: "municípios com cadastros",
             },
           ].map((s) => (
-            <div key={s.l} className="px-4 py-2 text-center">
-              <p className="font-display text-3xl font-700 text-forest-800">
-                {s.v}
-              </p>
-              <p className="mt-1 text-xs uppercase tracking-wide text-forest-500">
-                {s.l}
-              </p>
+            <div key={s.l} className="brand-stat">
+              <p>{s.v}</p>
+              <span>{s.l}</span>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Frentes do portal */}
-      <section className="container-page py-16">
-        <SectionTitle
-          center
-          eyebrow="O que é o Observatório"
-          title="Um portal, três frentes que conversam"
-          desc="Conteúdo institucional, um dashboard público de dados e uma vitrine de empreendimentos — tudo com a cara da floresta."
-        />
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
+      <section className="container-page py-16 sm:py-20">
+        <div className="flex items-end justify-between gap-6">
+          <SectionTitle
+            eyebrow="O Observatório"
+            title="Conhecer. Valorizar. Conectar."
+            desc="Três caminhos para aproximar os dados do território e as histórias de quem faz a floresta acontecer."
+          />
+          <BrandArt
+            motif="semente-verde"
+            className="hidden h-24 w-24 rotate-12 sm:block"
+          />
+        </div>
+        <div className="mt-10 grid gap-5 md:grid-cols-3">
           {[
             {
               to: "/observatorio",
-              titulo: "Dashboard de dados",
-              desc: "Mapa interativo do Acre com indicadores por município. Passe o mouse e clique para explorar.",
-              cta: "Abrir dashboard",
+              n: "01",
+              motif: "semente-oliva" as const,
+              title: "O território em dados",
+              desc: "Explore o mapa do Acre, a distribuição dos parceiros e os indicadores por município.",
+              cta: "Explorar o dashboard",
+              tone: "olive",
             },
             {
               to: "/vitrine",
-              titulo: "Vitrine de empreendimentos",
-              desc: "Conheça a história, os produtos e o contato dos negócios da sociobiodiversidade.",
-              cta: "Ver empreendimentos",
+              n: "02",
+              motif: "fruto" as const,
+              title: "Quem faz a floresta viver",
+              desc: "Conheça os negócios, os produtos, os serviços e as histórias da sociobiodiversidade.",
+              cta: "Conhecer a vitrine",
+              tone: "orange",
             },
             {
               to: "/legislacao",
-              titulo: "Legislação & notícias",
-              desc: "Leis, princípios de defesa da sociobiodiversidade e as atualizações do Observatório.",
-              cta: "Explorar conteúdo",
+              n: "03",
+              motif: "castanha" as const,
+              title: "Saberes que fortalecem",
+              desc: "Acesse a legislação e os princípios de defesa da floresta, dos povos e da bioeconomia.",
+              cta: "Consultar a legislação",
+              tone: "clay",
             },
           ].map((c) => (
             <Link
               key={c.to}
               to={c.to}
-              className="card group relative overflow-hidden p-6 transition hover:-translate-y-1 hover:shadow-md"
+              className={`brand-path brand-path-${c.tone} group`}
             >
-              <LeafMark className="h-9 w-9 text-forest-500" />
-              <h3 className="mt-4 font-display text-xl font-700 text-ink">
-                {c.titulo}
+              <div className="flex items-start justify-between">
+                <span className="brand-path-number">{c.n}</span>
+                <BrandArt
+                  motif={c.motif}
+                  className="h-20 w-20 transition-transform duration-300 group-hover:-rotate-12"
+                />
+              </div>
+              <h3 className="mt-8 font-display text-2xl font-bold leading-tight text-forest-900">
+                {c.title}
               </h3>
-              <p className="mt-2 text-sm leading-relaxed text-forest-700">
+              <p className="mt-3 text-sm leading-relaxed text-forest-700">
                 {c.desc}
               </p>
-              <span className="mt-4 inline-flex items-center gap-1 text-sm font-600 text-forest-700 group-hover:gap-2">
-                {c.cta} →
+              <span className="mt-6 flex items-center justify-between text-sm font-semibold text-forest-800">
+                {c.cta}
+                <span aria-hidden="true">↗</span>
               </span>
-              <FloatingLeaf className="absolute -bottom-4 -right-4 h-16 w-16 text-forest-50" />
             </Link>
           ))}
         </div>
       </section>
 
-      {/* Destaques da vitrine */}
-      <section className="bg-forest-50 py-16">
+      <section className="brand-showcase py-16 sm:py-20">
         <div className="container-page">
-          <div className="flex items-end justify-between gap-4">
+          <div className="flex flex-wrap items-end justify-between gap-5">
             <SectionTitle
-              eyebrow="Vitrine"
-              title="Empreendimentos em destaque"
+              eyebrow="Vitrine da floresta"
+              title="Histórias que merecem ser vistas."
             />
-            <Link
-              to="/vitrine"
-              className="hidden shrink-0 text-sm font-600 text-forest-700 link-underline sm:block"
-            >
-              ver todos →
+            <Link to="/vitrine" className="brand-text-link">
+              Ver a vitrine <span aria-hidden="true">→</span>
             </Link>
           </div>
-          {destaques.length === 0 && (
-            <p className="mt-6 text-forest-600">
-              A coleta de dados reais começou. Cadastre seu negócio para
-              participar da vitrine.
-            </p>
-          )}
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {destaques.map((e) => {
-              const mun = municipios.find(
-                (m) => m.codigo === e.municipioCodigo,
-              );
-              return (
-                <Link
-                  key={e.id}
-                  to={`/vitrine/${e.id}`}
-                  className="card group overflow-hidden transition hover:shadow-md"
-                >
-                  <div
-                    className="relative h-32 w-full"
-                    style={{
-                      background: `linear-gradient(135deg, ${e.cor}, #0a2015)`,
-                    }}
-                  >
-                    <LeafMark className="absolute right-3 top-3 h-6 w-6 text-white/50" />
-                  </div>
-                  <div className="p-5">
-                    <span className="chip">{e.categoria}</span>
-                    <h3 className="mt-2 font-display text-lg font-700 text-ink group-hover:text-forest-800">
-                      {e.nome}
-                    </h3>
-                    <p className="mt-1 text-xs text-forest-500">
-                      {mun?.nome} · {mun?.regiao}
-                    </p>
-                    <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-forest-700">
-                      {e.historia}
-                    </p>
-                  </div>
+          {destaques.length === 0 ? (
+            <div className="brand-empty mt-8">
+              <div className="brand-empty-art">
+                <BrandArt motif="fruto" className="h-24 w-24" />
+                <BrandArt motif="semente-verde" className="h-20 w-20" />
+              </div>
+              <div className="max-w-lg">
+                <p className="eyebrow">A vitrine está começando</p>
+                <h3 className="mt-2 font-display text-2xl font-bold text-forest-900">
+                  O próximo capítulo pode ser o seu.
+                </h3>
+                <p className="mt-3 leading-relaxed text-forest-700">
+                  Tem um produto ou serviço ligado à sociobiodiversidade do
+                  Acre? Envie seu cadastro. Os perfis aparecem aqui depois da
+                  aprovação da equipe.
+                </p>
+                <Link to="/cadastro?participacao=vitrine" className="btn-primary mt-5">
+                  Cadastrar na vitrine <span aria-hidden="true">↗</span>
                 </Link>
-              );
-            })}
-          </div>
+              </div>
+            </div>
+          ) : (
+            <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {destaques.map((e) => {
+                const mun = municipios.find(
+                  (m) => m.codigo === e.municipioCodigo,
+                );
+                return (
+                  <Link
+                    key={e.id}
+                    to={`/vitrine/${e.id}`}
+                    className="card group overflow-hidden transition hover:-translate-y-1"
+                  >
+                    <div className="relative flex h-36 items-center justify-center overflow-hidden bg-brand-green">
+                      <BrandArt
+                        motif="semente-oliva"
+                        className="h-28 w-28 rotate-12"
+                      />
+                      <BrandArt
+                        motif="rio"
+                        className="absolute -bottom-4 left-0 w-full opacity-70"
+                      />
+                    </div>
+                    <div className="p-6">
+                      <span className="chip">{e.categoria}</span>
+                      <h3 className="mt-3 font-display text-xl font-bold text-forest-900">
+                        {e.nome}
+                      </h3>
+                      <p className="mt-1 text-xs text-forest-600">
+                        {mun?.nome} · {mun?.regiao}
+                      </p>
+                      <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-forest-700">
+                        {e.historia}
+                      </p>
+                      <span className="brand-text-link mt-5 inline-block">
+                        Conhecer a história →
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
 
-      {/* Notícias */}
-      <section className="container-page py-16">
-        <div className="flex items-end justify-between gap-4">
-          <SectionTitle eyebrow="Portal" title="Últimas do Observatório" />
-          <Link
-            to="/noticias"
-            className="hidden shrink-0 text-sm font-600 text-forest-700 link-underline sm:block"
-          >
-            todas as notícias →
+      <section className="container-page py-16 sm:py-20">
+        <div className="flex flex-wrap items-end justify-between gap-5">
+          <SectionTitle
+            eyebrow="Fique por dentro"
+            title="O que acontece por aqui."
+          />
+          <Link to="/noticias" className="brand-text-link">
+            Todas as notícias →
           </Link>
         </div>
-        {noticias.length === 0 && (
-          <p className="mt-6 text-forest-500">
-            As notícias oficiais serão publicadas aqui.
-          </p>
-        )}
-        <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {noticias.map((n) => (
-            <article key={n.id} className="border-t-2 border-forest-200 pt-4">
-              <span className="eyebrow !text-river-700">{n.categoria}</span>
-              <h3 className="mt-2 font-display text-lg font-700 leading-snug text-ink">
-                {n.titulo}
+        {noticias.length === 0 ? (
+          <div className="brand-news-empty mt-8">
+            <BrandArt motif="olhos" className="w-36 shrink-0" />
+            <div>
+              <h3 className="font-display text-xl font-semibold text-forest-900">
+                Um olhar atento à floresta.
               </h3>
-              <p className="mt-2 text-sm leading-relaxed text-forest-700">
-                {n.resumo}
+              <p className="mt-2 text-sm text-forest-700">
+                As notícias oficiais do Observatório serão publicadas aqui.
+                Enquanto isso, conheça o projeto e as formas de participar.
               </p>
-              <p className="mt-3 text-xs text-forest-400">{fmtData(n.data)}</p>
-            </article>
-          ))}
-        </div>
+              <Link to="/sobre" className="brand-text-link mt-4 inline-block">
+                Conheça o Observatório →
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {noticias.slice(0, 4).map((n) => (
+              <article
+                key={n.id}
+                className="border-t-4 border-brand-orange pt-5"
+              >
+                <span className="eyebrow !text-brand-red">{n.categoria}</span>
+                <h3 className="mt-3 font-display text-xl font-bold leading-snug text-forest-900">
+                  {n.titulo}
+                </h3>
+                <p className="mt-3 text-sm leading-relaxed text-forest-700">
+                  {n.resumo}
+                </p>
+                <p className="mt-4 text-xs text-forest-600">
+                  {fmtData(n.data)}
+                </p>
+              </article>
+            ))}
+          </div>
+        )}
       </section>
 
-      {/* CTA cadastro */}
-      <section className="container-page pb-20">
-        <div className="relative overflow-hidden rounded-lg bg-forest-900 px-8 py-14 text-center text-white">
-          <OrganicBg />
-          <div className="relative mx-auto max-w-2xl">
-            <h2 className="font-display text-3xl font-700">
-              É um empreendedor da floresta?
+      <section className="container-page pb-8">
+        <div className="brand-participate">
+          <BrandArt motif="rio" className="brand-participate-river" />
+          <div className="relative z-10">
+            <p className="eyebrow !text-brand-yellow">Faça parte dessa rede</p>
+            <h2 className="mt-4 max-w-xl font-display text-3xl font-bold leading-tight sm:text-4xl">
+              A floresta ganha força
+              <br />
+              quando a gente se conecta.
             </h2>
-            <div className="mx-auto mt-4 h-px w-16 bg-sun-500" />
-            <p className="mt-4 leading-relaxed text-forest-100/90">
-              Cadastre seu negócio, conte sua história e apareça na vitrine do
-              Observatório. O cadastro é gratuito e passa por uma curadoria
-              simples da nossa equipe.
+            <p className="mt-5 max-w-xl leading-relaxed text-white/90">
+              Você pode divulgar seus produtos e serviços na vitrine ou
+              contribuir com o mapeamento do Observatório. Todo cadastro passa
+              pela análise da equipe.
             </p>
+          </div>
+          <div className="relative z-10 grid gap-3 self-center">
             <Link
-              to="/formulario/vitrine"
-              className="btn mt-7 bg-sun-500 text-forest-950 hover:bg-sun-400"
+              to="/cadastro?participacao=ambos"
+              className="btn bg-brand-yellow text-forest-950 hover:bg-paper"
             >
-              Cadastrar meu empreendimento
+              Tenho produtos ou serviços <span aria-hidden="true">↗</span>
             </Link>
+            <Link
+              to="/cadastro?participacao=dashboard"
+              className="btn border border-white/60 text-white hover:bg-white/10"
+            >
+              Quero contribuir com dados <span aria-hidden="true">↗</span>
+            </Link>
+            <p className="text-center text-xs text-white/80">
+              Cadastro gratuito · Acesso rápido, sem confirmação por e-mail
+            </p>
           </div>
         </div>
       </section>
