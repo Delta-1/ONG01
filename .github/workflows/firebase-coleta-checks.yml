@@ -1,0 +1,20 @@
+name: Verificar coleta Firebase
+on:
+  pull_request:
+    paths: ['firebase-coleta/**', '.github/workflows/firebase-coleta-checks.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node --check firebase-coleta/public/app.js
+      - run: node --check firebase-coleta/public/firebase-config.js
+      - run: node --check firebase-coleta/public/validation.mjs
+      - run: node --test firebase-coleta/tests/validation.test.mjs

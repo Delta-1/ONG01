@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Coleta de empreendimentos | Observatório Acriano</title>
+<meta name="description" content="Formulário de coleta assistida de dados dos empreendimentos do Acre pela equipe do Observatório.">
+<link rel="stylesheet" href="./styles.css"><script type="module" src="./app.js"></script></head>
+<body><a class="skip" href="#cadastro">Pular para o formulário</a>
+<header><div class="wrap brand"><span class="symbol" aria-hidden="true">◉</span><div><strong>Observatório Acriano</strong><span>Coleta assistida de empreendimentos</span></div></div></header>
+<main class="wrap layout">
+<aside><span class="eyebrow">EQUIPE DA ONG · ACRE</span><h1>Cada trabalho conta uma história.</h1><p>Registre as organizações do território com informações conferidas e autorização de quem participa.</p>
+<ol class="guide"><li><b>Entre com sua conta da equipe</b><span>Somente pessoas liberadas pela ONG podem enviar.</span></li><li><b>Preencha os dados da organização</b><span>Escolha vitrine, dashboard ou os dois.</span></li><li><b>Envie para conferência</b><span>Este formulário não publica automaticamente no site.</span></li></ol>
+<div class="note"><b>Antes de preencher</b><p>Tenha o município, um contato do responsável e uma breve apresentação. CNPJ e números de produção só entram quando informados.</p></div>
+<p class="small">Coleta separada do cadastro público do site. Não é necessário criar uma conta para cada empresa atendida.</p></aside>
+<section class="card" aria-labelledby="form-title">
+<div class="form-head"><span class="eyebrow">REGISTRO ASSISTIDO</span><h2 id="form-title">Cadastrar uma organização</h2><p>Os campos com * são obrigatórios. Não sabe um número? Deixe em branco.</p></div>
+<section class="access" aria-label="Acesso da equipe"><p id="connection" role="status" aria-live="polite">Verificando a disponibilidade da coleta…</p><p id="account"></p>
+<button type="button" id="signin" disabled>Entrar com Google</button><button type="button" id="signout" class="secondary" hidden>Sair da conta</button></section>
+<form id="cadastro"><fieldset id="fields" disabled>
+<legend class="sr-only">Dados da organização</legend>
+<h3>1. Organização e território</h3>
+<label>Nome do empreendimento ou organização *<input name="nome" required minlength="3" maxlength="160" autocomplete="organization"></label>
+<div class="grid"><label>Tipo de organização *<select name="tipo" required><option value="">Selecione</option><option>Cooperativa</option><option>Associação</option><option>Empresa</option><option>Empreendedor individual</option><option>Coletivo comunitário</option><option>Instituição de apoio</option><option>Outro</option></select></label>
+<label>Funcionamento *<select name="funcionamento" required><option value="">Selecione</option><option value="em_atividade">Em atividade</option><option value="inativo">Inativo</option><option value="em_formacao">Em formação</option><option value="nao_sei">Não sei informar</option></select></label></div>
+<div class="grid"><label>Município do Acre *<select name="municipio_codigo" id="municipio" required><option value="">Selecione</option></select></label><label>Região<input id="regiao" readonly placeholder="Preenchida pelo município"></label></div>
+<h3>2. Participação no Observatório</h3>
+<label>Como a organização deseja participar? *<select name="participacao" id="participacao" required><option value="ambos">Vitrine e dashboard</option><option value="vitrine">Somente vitrine</option><option value="dashboard">Somente dashboard</option></select></label>
+<p id="participation-help" class="hint">Vitrine: apresentação de produtos ou serviços. Dashboard: dados para os indicadores.</p>
+<label>Apresentação do trabalho *<textarea name="historia" required minlength="30" maxlength="4000" rows="4" placeholder="O que a organização faz, onde atua e quem participa?"></textarea></label>
+<label>Produtos ou serviços <span id="products-required">*</span><input name="produtos" id="produtos" required minlength="3" maxlength="1500" placeholder="Ex.: artesanato, oficinas, castanha"><span class="hint">Obrigatório para participar da vitrine.</span></label>
+<label>Como pode colaborar com o Observatório? <span id="collaboration-required" hidden>*</span><textarea name="colaboracao" id="colaboracao" maxlength="2000" rows="2" placeholder="Ex.: dados, pesquisa, apoio técnico ou formação"></textarea></label>
+<h3>3. Contato e identificação</h3>
+<label>Nome do responsável *<input name="responsavel" required minlength="2" maxlength="160" autocomplete="name"></label>
+<div class="grid"><label>Telefone ou WhatsApp *<input name="telefone" type="tel" required minlength="8" maxlength="30" autocomplete="tel"></label><label>E-mail de contato<input name="email" type="email" maxlength="254" autocomplete="email"></label></div>
+<label>Site da organização<input name="site" type="url" maxlength="500" placeholder="https://"></label>
+<label>Possui CNPJ? *<select name="possui_cnpj" id="possui-cnpj" required><option value="nao">Não</option><option value="sim">Sim</option><option value="nao_sei">Não sei informar</option></select></label>
+<div id="cnpj-fields" class="grid" hidden><label>CNPJ *<input name="cnpj" id="cnpj" maxlength="18" autocomplete="off"></label><label>Situação declarada *<select name="situacao_cnpj" id="situacao-cnpj"><option value="">Selecione</option><option value="ativo">Ativo</option><option value="inativo">Inativo, baixado, suspenso ou inapto</option><option value="nao_sei">Não sei informar</option></select></label></div>
+<p class="hint">Não ter CNPJ não impede o registro. A situação é declarada, sem consulta à Receita Federal.</p>
+<h3>4. Números opcionais</h3>
+<p class="hint">Use zero somente quando ele for o valor correto. Quantidades informadas precisam de ano de referência.</p>
+<div class="grid"><label>Pessoas que trabalham<input name="trabalhadores" type="number" min="0" max="10000000" step="1"></label><label>Famílias envolvidas<input name="familias" type="number" min="0" max="10000000" step="1"></label><label>Produção anual em toneladas<input name="producao_anual_ton" type="number" min="0" max="1000000000" step="0.001"></label><label>Ano de referência<input name="ano_referencia" id="ano" type="number" min="2000" step="1"></label></div>
+<label class="consent"><input name="consentimento" id="consentimento" type="checkbox" required><span>Confirmo que tenho autorização para registrar estes dados e que expliquei a finalidade escolhida ao responsável. O envio será conferido antes de qualquer divulgação.</span></label>
+<button type="submit" id="submit">Enviar cadastro para conferência <span aria-hidden="true">↗</span></button>
+</fieldset></form>
+<p id="error" class="error" role="alert" hidden></p>
+<section id="success" class="success" role="status" tabindex="-1" hidden><h3>Cadastro recebido</h3><p id="protocol"></p><p>O registro foi gravado na coleta Firebase e aguarda conferência da ONG. Ele ainda não foi publicado na vitrine ou no dashboard.</p><button id="another" type="button">Cadastrar outra organização</button></section>
+<p class="privacy">As informações deste formulário são de consulta restrita. Não envie senhas, documentos pessoais ou informações de saúde. Confira os dados com a organização antes de enviar.</p>
+</section></main><footer class="wrap">Observatório Acriano da Sociobioeconomia · Coleta assistida da ONG</footer></body></html>
