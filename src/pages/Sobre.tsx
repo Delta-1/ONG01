@@ -20,7 +20,7 @@ export default function Sobre() {
           },
           {
             t: "Dashboard público",
-            d: "Um painel de dados feito sob medida, com mapa interativo do Acre e indicadores por município — sem depender de ferramentas engessadas.",
+            d: "Um mapa interativo do Acre com dados aprovados de organizações, produtos, serviços e parceiros por município.",
           },
           {
             t: "Vitrine de empreendimentos",
@@ -40,10 +40,11 @@ export default function Sobre() {
         </h2>
         <ol className="mt-5 space-y-4">
           {[
-            "O empreendedor cria sua conta e preenche o formulário de apresentação do negócio.",
-            "A conta dá acesso ao painel do empreendedor e ao botão Publicar.",
-            "O empreendedor clica em Publicar, preenche o formulário e envia o conteúdo para análise.",
-            "Após a aprovação da equipe, a publicação aparece no perfil público e a empresa recebe um aviso no painel.",
+            "Crie seu acesso rápido com nome, e-mail e senha. Você entra no painel sem aguardar confirmação por e-mail.",
+            "No painel, clique em Cadastrar minha organização e escolha somente vitrine, somente dashboard ou os dois.",
+            "Preencha os dados em etapas, salve um rascunho se precisar e envie para análise da ONG.",
+            "Acompanhe a aprovação ou o pedido de ajustes no painel. Os dados aparecem somente nos destinos escolhidos após a aprovação.",
+            "Mantenha os dados atualizados e, se participar da vitrine, envie novas publicações. Cada alteração passa pela curadoria.",
           ].map((passo, i) => (
             <li key={i} className="flex gap-4">
               <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-forest-600 font-display text-sm font-700 text-white">
