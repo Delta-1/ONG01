@@ -1,0 +1,54 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function googleAccount() {
+      return request.auth != null && request.auth.token.email_verified == true
+        && request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
+    function staff() {
+      return googleAccount()
+        && exists(/databases/$(database)/documents/equipe_coleta/$(request.auth.uid))
+        && get(/databases/$(database)/documents/equipe_coleta/$(request.auth.uid)).data.ativo == true;
+    }
+    function str(v, max) { return v is string && v.size() <= max; }
+    function integerOptional(v) { return v == null || (v is int && v >= 0 && v <= 10000000); }
+    function geography(d) {
+      return d.municipio_codigo in ["1200013","1200054","1200104","1200138","1200179","1200203","1200252","1200302","1200328","1200336","1200344","1200351","1200385","1200807","1200393","1200401","1200427","1200435","1200500","1200450","1200609","1200708"]
+        && ((d.municipio_codigo in ["1200203","1200336","1200427","1200393","1200351","1200609","1200302","1200328"] && d.regiao == 'Vale do Juruá')
+          || (!(d.municipio_codigo in ["1200203","1200336","1200427","1200393","1200351","1200609","1200302","1200328"]) && d.regiao == 'Vale do Acre'));
+    }
+    function valid(d) {
+      return d.keys().hasAll(["nome","tipo","funcionamento","municipio_codigo","regiao","participacao","possui_cnpj","cnpj","situacao_cnpj","responsavel","telefone","email","site","historia","produtos","colaboracao","trabalhadores","familias","producao_anual_ton","ano_referencia","consentimento","owner_uid","origem","schema_version","status","criado_em"])
+        && d.keys().hasOnly(["nome","tipo","funcionamento","municipio_codigo","regiao","participacao","possui_cnpj","cnpj","situacao_cnpj","responsavel","telefone","email","site","historia","produtos","colaboracao","trabalhadores","familias","producao_anual_ton","ano_referencia","consentimento","owner_uid","origem","schema_version","status","criado_em"])
+        && d.owner_uid == request.auth.uid && d.status == 'pendente'
+        && d.origem == 'coleta-ong' && d.schema_version == 1 && d.consentimento == true && d.criado_em == request.time
+        && str(d.nome, 160) && d.nome.size() >= 3 && str(d.responsavel, 160) && d.responsavel.size() >= 2
+        && str(d.historia, 4000) && d.historia.size() >= 30
+        && d.tipo in ['Cooperativa','Associação','Empresa','Empreendedor individual','Coletivo comunitário','Instituição de apoio','Outro']
+        && d.funcionamento in ['em_atividade','inativo','em_formacao','nao_sei']
+        && geography(d) && d.participacao in ['vitrine','dashboard','ambos']
+        && str(d.telefone, 30) && d.telefone.size() >= 8 && str(d.email, 254)
+        && str(d.site, 500) && (d.site == '' || d.site.matches('https?://.+'))
+        && str(d.produtos, 1500) && (d.participacao == 'dashboard' || d.produtos.size() >= 3)
+        && str(d.colaboracao, 2000) && (d.participacao != 'dashboard' || d.colaboracao.size() >= 10)
+        && d.possui_cnpj in ['sim','nao','nao_sei'] && str(d.cnpj, 14) && str(d.situacao_cnpj, 20)
+        && ((d.possui_cnpj == 'sim' && d.cnpj.matches('[A-Z0-9]{12}[0-9]{2}') && d.situacao_cnpj in ['ativo','inativo','nao_sei'])
+          || (d.possui_cnpj != 'sim' && d.cnpj == '' && d.situacao_cnpj == ''))
+        && integerOptional(d.trabalhadores) && integerOptional(d.familias)
+        && (d.producao_anual_ton == null || (d.producao_anual_ton is number && d.producao_anual_ton >= 0 && d.producao_anual_ton <= 1000000000))
+        && (d.ano_referencia == null || (d.ano_referencia is int && d.ano_referencia >= 2000 && d.ano_referencia <= request.time.year()))
+        && ((d.trabalhadores == null && d.familias == null && d.producao_anual_ton == null) || d.ano_referencia != null);
+    }
+    match /equipe_coleta/{uid} {
+      allow get: if googleAccount() && request.auth.uid == uid;
+      allow list, create, update, delete: if false;
+    }
+    match /coletas_ong/{id} {
+      allow create: if staff() && valid(request.resource.data);
+      // Consulta e curadoria pelo console/IAM até existir backend próprio.
+      allow get, list, update, delete: if false;
+    }
+    // Não publique este arquivo sobre regras existentes sem revisar a mesclagem.
+    match /{document=**} { allow read, write: if false; }
+  }
+}
