@@ -144,7 +144,7 @@ export default function Home() {
                   Acre? Envie seu cadastro. Os perfis aparecem aqui depois da
                   aprovação da equipe.
                 </p>
-                <Link to="/formulario/vitrine" className="btn-primary mt-5">
+                <Link to="/cadastro?participacao=vitrine" className="btn-primary mt-5">
                   Cadastrar na vitrine <span aria-hidden="true">↗</span>
                 </Link>
               </div>
@@ -261,19 +261,19 @@ export default function Home() {
           </div>
           <div className="relative z-10 grid gap-3 self-center">
             <Link
-              to="/formulario/vitrine"
+              to="/cadastro?participacao=ambos"
               className="btn bg-brand-yellow text-forest-950 hover:bg-paper"
             >
               Tenho produtos ou serviços <span aria-hidden="true">↗</span>
             </Link>
             <Link
-              to="/formulario/dashboard"
+              to="/cadastro?participacao=dashboard"
               className="btn border border-white/60 text-white hover:bg-white/10"
             >
               Quero contribuir com dados <span aria-hidden="true">↗</span>
             </Link>
             <p className="text-center text-xs text-white/80">
-              Cadastro gratuito · Não precisa criar conta
+              Cadastro gratuito · Acesso rápido, sem confirmação por e-mail
             </p>
           </div>
         </div>

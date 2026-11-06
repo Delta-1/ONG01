@@ -101,7 +101,7 @@ export default function Vitrine() {
           desc="Negócios da floresta, aprovados pela curadoria do Observatório. Conheça histórias, produtos e formas de contato."
         />
         <div className="flex flex-col gap-4">
-          <Link className="btn-primary" to="/formulario/vitrine">
+          <Link className="btn-primary" to="/cadastro?participacao=vitrine">
             Cadastrar na vitrine
           </Link>
           <div className="relative sm:w-72">
@@ -153,7 +153,7 @@ export default function Vitrine() {
                   Limpar busca
                 </button>
               ) : (
-                <Link to="/formulario/vitrine" className="btn-primary mt-5">
+                <Link to="/cadastro?participacao=vitrine" className="btn-primary mt-5">
                   Quero participar da vitrine ↗
                 </Link>
               )}

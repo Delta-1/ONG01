@@ -152,7 +152,7 @@ function UtilityBar() {
           Feito de floresta, pessoas e histórias.
         </span>
         <Link
-          to="/formulario/dashboard"
+          to="/cadastro"
           className="underline underline-offset-4 hover:text-brand-yellow"
         >
           Contribua com o mapeamento ↗
@@ -201,7 +201,7 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
       <div className="container-page flex flex-col gap-1 py-3">
         <NavLinks vertical onNavigate={onClose} />
         <Link
-          to="/formulario/dashboard"
+          to="/cadastro"
           className="rounded-md px-3 py-2 text-sm font-medium text-forest-700"
           onClick={onClose}
         >
@@ -215,7 +215,7 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
           Entrar na minha conta
         </Link>
         <Link
-          to="/formulario/vitrine"
+          to="/cadastro"
           className="btn-primary mt-2"
           onClick={onClose}
         >
@@ -263,7 +263,7 @@ function SiteFooter() {
           <h4 className="eyebrow !text-forest-300">Participe</h4>
           <ul className="mt-3 space-y-2 text-sm text-forest-200">
             <li>
-              <Link to="/formulario/vitrine" className="hover:text-white">
+              <Link to="/cadastro" className="hover:text-white">
                 Cadastre seu empreendimento
               </Link>
             </li>
@@ -288,7 +288,7 @@ function SiteFooter() {
             Sócio-bioeconomia.
           </span>
           <Link
-            to="/formulario/dashboard"
+            to="/cadastro"
             className="text-forest-200 hover:text-white"
           >
             Contribua com o mapeamento ↗
@@ -317,7 +317,7 @@ function ShellClassica({ children }: { children: ReactNode }) {
             <NavLinks />
           </nav>
           <div className="hidden items-center gap-2 xl:flex">
-            <Link to="/formulario/vitrine" className="btn-primary">
+            <Link to="/cadastro" className="btn-primary">
               Cadastre seu negócio
             </Link>
           </div>
@@ -344,7 +344,7 @@ function ShellCentral({ children }: { children: ReactNode }) {
           <BrandLogo stacked />
           <nav className="flex items-center gap-7">
             <NavLinks />
-            <Link to="/formulario/vitrine" className="btn-primary !py-1.5">
+            <Link to="/cadastro" className="btn-primary !py-1.5">
               Cadastre seu negócio
             </Link>
           </nav>
@@ -379,7 +379,7 @@ function ShellMinimalista({ children }: { children: ReactNode }) {
           </nav>
           <div className="flex items-center gap-3">
             <Link
-              to="/formulario/vitrine"
+              to="/cadastro"
               className="hidden text-sm font-600 text-forest-700 hover:text-ink sm:inline"
             >
               Cadastrar →
@@ -408,7 +408,7 @@ function ShellLateral({ children }: { children: ReactNode }) {
         <nav className="mt-8 flex flex-col gap-1">
           <NavLinks vertical />
         </nav>
-        <Link to="/formulario/vitrine" className="btn-primary mt-4">
+        <Link to="/cadastro" className="btn-primary mt-4">
           Cadastre seu negócio
         </Link>
         <div className="mt-auto border-t border-forest-100 pt-4">
@@ -493,7 +493,7 @@ function ShellImersiva({ children }: { children: ReactNode }) {
               </NavLink>
             ))}
             <Link
-              to="/formulario/vitrine"
+              to="/cadastro"
               onClick={() => setOpen(false)}
               className="mt-6 rounded-full bg-sun-500 px-8 py-3 text-lg font-700 text-forest-950 transition hover:bg-sun-400"
             >

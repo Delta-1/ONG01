@@ -24,6 +24,7 @@ const Publicar = lazy(() => import("./pages/Publicar"));
 const RecuperarSenha = lazy(() => import("./pages/RecuperarSenha"));
 const RedefinirSenha = lazy(() => import("./pages/RedefinirSenha"));
 const FormularioRapido = lazy(() => import("./pages/FormularioRapido"));
+const Contribuir = lazy(() => import("./pages/Contribuir"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 export default function App() {
@@ -70,6 +71,7 @@ export default function App() {
             <Route path="/recuperar-senha" element={<RecuperarSenha />} />
             <Route path="/redefinir-senha" element={<RedefinirSenha />} />
             <Route path="/painel" element={<Painel />} />
+            <Route path="/contribuir" element={<Contribuir />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

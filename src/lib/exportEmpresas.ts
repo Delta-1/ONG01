@@ -14,7 +14,7 @@ export async function carregarPlanilhaEmpresas() {
     readAllPages((from, to) =>
       db()
         .from("cadastros_rapidos")
-        .select("id,status,dados,empreendimento_id")
+        .select("id,status,dados,empreendimento_id,referencia_id,created_at")
         .not("dados", "cs", '{"is_demo":true}')
         .order("id")
         .range(from, to),

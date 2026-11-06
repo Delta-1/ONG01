@@ -99,8 +99,8 @@ export default function Admin() {
     );
   if (!auth.isAdmin) return <Navigate to="/painel" replace />;
   const empresas = state.data?.empresas ?? [],
-    posts = state.data?.posts ?? [],
-    byId = Object.fromEntries(empresas.map((e) => [e.id, e]));
+    byId = Object.fromEntries(empresas.map((e) => [e.id, e])),
+    posts = (state.data?.posts ?? []).filter((post) => byId[post.empreendimento_id]);
   const normalize = (value: string) =>
     value
       .normalize("NFD")
@@ -170,7 +170,7 @@ export default function Admin() {
           onFocus={(e) => e.target.select()}
         />
         <p className="mt-2 text-sm text-forest-500">
-          Criar conta, entrar, clicar em Publicar e enviar o formulário.
+          Criar acesso rápido, cadastrar a organização no painel e enviar os dados para análise.
         </p>
       </div>
       <section className="card mt-6 space-y-4 p-5">
@@ -180,7 +180,7 @@ export default function Admin() {
         <p className="text-sm text-forest-600">
           Escolha um empreendimento para criar uma publicação em nome dele.
           Depois do envio, aprove em Em análise para divulgar o conteúdo. O
-          perfil aprovado entra na vitrine e nos totais do dashboard público.
+          perfil aprovado aparece na vitrine. A participação nos indicadores depende da finalidade escolhida no cadastro.
         </p>
         <label className="block text-sm font-semibold">
           Empresa da publicação

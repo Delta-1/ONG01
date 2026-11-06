@@ -2,7 +2,7 @@ begin;
 insert into auth.users(id,email,raw_user_meta_data) values('c6000000-0000-4000-8000-000000000001','qa-partner-admin@example.invalid','{}');
 update public.profiles set role='admin' where id='c6000000-0000-4000-8000-000000000001';
 set local role service_role;
-select public.receber_cadastro_rapido('c6000000-0000-4000-8000-000000000002','{"finalidade":"dashboard","tipo":"Associação","funcionamento":"em_atividade","possui_produtos":"nao","possui_cnpj":"sim","cnpj":"11.222.333/0001-81","situacao_cnpj":"ativo","nome":"QA Parceiro sem vitrine","municipio_codigo":"1200252","categoria":"Pesquisa e apoio","historia":"Organização temporária para verificar o cadastro de parceiros sem vitrine.","produtos":[],"telefone":"68999990000","preenchido_por":"Equipe QA","colaboracao":"Compartilhar estudos e dados para o Observatório.","trabalhadores":4,"familias":null,"producao_anual_ton":null,"ano_referencia":2026,"site":"https://example.org","consentimento":true}',repeat('c',64));
+select public.receber_cadastro_rapido('c6000000-0000-4000-8000-000000000002','{"finalidade":"dashboard","tipo":"Associação","funcionamento":"em_atividade","possui_produtos":"nao","possui_cnpj":"sim","cnpj":"12.ABC.345/01DE-35","situacao_cnpj":"ativo","nome":"QA Parceiro sem vitrine","municipio_codigo":"1200252","categoria":"Pesquisa e apoio","historia":"Organização temporária para verificar o cadastro de parceiros sem vitrine.","produtos":[],"telefone":"68999990000","preenchido_por":"Equipe QA","colaboracao":"Compartilhar estudos e dados para o Observatório.","trabalhadores":4,"familias":null,"producao_anual_ton":null,"ano_referencia":2026,"site":"https://example.org","consentimento":true}',repeat('c',64));
 select public.receber_cadastro_rapido('c6000000-0000-4000-8000-000000000003','{"finalidade":"vitrine","tipo":"Cooperativa","funcionamento":"em_atividade","possui_produtos":"sim","possui_cnpj":"nao","nome":"QA Parceiro com vitrine","municipio_codigo":"1200252","categoria":"Castanha","historia":"Empreendimento temporário para verificar a vitrine e os indicadores sem duplicação.","produtos":["Castanha"],"telefone":"68999990000","preenchido_por":"Equipe QA","familias":0,"trabalhadores":8,"producao_anual_ton":1.25,"ano_referencia":2026,"consentimento":true}',repeat('c',64));
 do $$declare d jsonb; begin
  select dados into d from public.cadastros_rapidos where id='c6000000-0000-4000-8000-000000000002';
@@ -34,3 +34,10 @@ do $$declare v jsonb; begin
 end$$;
 rollback;
 select 'PASS: finalidades separadas, validação, aprovação, indicadores anônimos sem CNPJ/contatos, zero e ausência distintos; dados revertidos' as resultado;
+-- Vectors from Receita/Serpro; validates the number, not fiscal status.
+DO $$ BEGIN
+ IF NOT private.cnpj_valido('12.ABC.345/01DE-35') OR NOT private.cnpj_valido('11.222.333/0001-81')
+ OR private.cnpj_valido('12345678901234') OR private.cnpj_valido('00000000000000') THEN
+ RAISE EXCEPTION 'CNPJ digit validation failed'; END IF;
+END $$;
+SELECT 'PASS: numeric and alphanumeric CNPJ check digits' AS resultado;

@@ -62,10 +62,10 @@ export default function Dashboard() {
         dados e colaboração. A base é um mapeamento em construção.
       </p>
       <div className="mt-5 flex flex-wrap gap-3">
-        <Link className="btn-primary" to="/formulario/dashboard">
+        <Link className="btn-primary" to="/cadastro?participacao=dashboard">
           Contribuir com dados e parceria
         </Link>
-        <Link className="btn-ghost" to="/formulario/vitrine">
+        <Link className="btn-ghost" to="/cadastro?participacao=vitrine">
           Cadastrar na vitrine
         </Link>
       </div>

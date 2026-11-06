@@ -144,9 +144,9 @@ export default function FormularioRapido() {
           Cadastro de parceiros do Observatório
         </h1>
         <p className="mt-3 text-forest-600">
-          Preencha os dados do negócio. Não precisa criar conta. Tudo será
-          enviado para análise do administrador antes de aparecer no site.
+          Formulário para a equipe cadastrar organizações durante a coleta. Tudo será enviado para análise da ONG antes de aparecer no site.
         </p>
+        <p className="mt-3 rounded-xl bg-forest-50 p-4 text-sm">Você é o responsável pela organização? <Link className="font-semibold underline" to="/cadastro">Crie seu acesso rápido</Link> para preencher e acompanhar a análise pelo seu painel.</p>
         <form className="card mt-6 space-y-5 p-5 sm:p-8" onSubmit={submit}>
           <fieldset className="space-y-3 rounded-xl bg-forest-50 p-4">
             <legend className="font-semibold">

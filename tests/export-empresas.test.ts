@@ -97,3 +97,13 @@ assert.ok(
     updated.csv.includes("Ano de referência"),
 );
 assert.equal(criarPlanilhaEmpresas([], [{...semVitrine,dados:{...semVitrine.dados,is_demo:true}}], []).total,0,"Teste arquivado não entra nos relatórios");
+
+const revisao = { ...semVitrine, id: "revisao-aprovada", referencia_id: semVitrine.id, created_at: "2026-11-06T12:00:00Z", dados: { ...semVitrine.dados, nome: "Nome atualizado", participacao: "dashboard" as const, trabalhadores: 0 } };
+const revisoes = criarPlanilhaEmpresas([], [{ ...semVitrine, created_at: "2026-11-01T12:00:00Z" }, revisao], []);
+assert.equal(revisoes.total, 1, "Revisões aprovadas não duplicam o parceiro");
+assert.ok(revisoes.csv.includes("Nome atualizado") && !revisoes.csv.includes("Negócio em análise"));
+for (const participacao of ["vitrine", "dashboard", "ambos"] as const) {
+ const out = criarPlanilhaEmpresas([], [{ ...intake, dados: { ...intake.dados, participacao } }], []);
+ assert.ok(out.csv.includes(participacao === "ambos" ? "Vitrine e dashboard" : participacao === "vitrine" ? "Somente vitrine" : "Somente dashboard"));
+}
+console.log("PASS: revisões deduplicadas e três finalidades exportadas");

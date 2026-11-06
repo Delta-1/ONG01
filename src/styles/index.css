@@ -215,6 +215,20 @@ input[type="radio"] {
 .brand-symbol-light {
   width: 80px;
 }
+.guia-cadastro { position: relative; border-radius: 18px; border: 1px solid #c7dccd; padding: 18px 20px; background: #eef4e9; color: #174630; }
+.guia-cadastro::before { content: ""; position: absolute; top: -7px; left: 29px; width: 12px; height: 12px; transform: rotate(45deg); background: #eef4e9; border-top: 1px solid #c7dccd; border-left: 1px solid #c7dccd; }
+.guia-icone { display: inline-grid; place-items: center; background: #166340; color: #fff9eb; width: 22px; height: 22px; border-radius: 50%; font-size: 13px; flex-shrink: 0; }
+.etapas-cadastro { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 10px; margin: 28px 0; }
+.etapas-cadastro li { display: flex; flex-direction: column; gap: 8px; font-size: 12px; color: #66756b; border-top: 3px solid #dce7d9; padding-top: 12px; }
+.etapas-cadastro li > span:first-child { display: grid; place-items: center; width: 27px; height: 27px; border-radius: 50%; background: #e6eddf; font-weight: 700; }
+.etapas-cadastro li[aria-current="step"], .etapas-cadastro li[data-concluida="true"] { color: #166340; border-color: #166340; }
+.etapas-cadastro li[aria-current="step"] > span:first-child, .etapas-cadastro li[data-concluida="true"] > span:first-child { color: #fff9eb; background: #166340; }
+.escolha-participacao { display: flex; align-items: flex-start; gap: 14px; padding: 19px; border: 1px solid #d1dfcd; border-radius: 15px; cursor: pointer; transition: border-color 150ms, background-color 150ms; }
+.escolha-participacao input { margin-top: 5px; width: 18px; height: 18px; flex-shrink: 0; }
+.escolha-ativa { border-color: #166340; box-shadow: inset 0 0 0 1px #166340; background: #f2f5e9; }
+.revisao-cadastro > div { padding: 13px 0; border-bottom: 1px solid #e0e8da; overflow-wrap: anywhere; }
+.revisao-cadastro dt { font-size: 12px; color: #66756b; margin-bottom: 3px; }
+.revisao-cadastro dd { font-size: 15px; }
 .brand-pupils {
   transform: translate(var(--eye-x, 0px), var(--eye-y, 0px));
   transition: transform 460ms cubic-bezier(0.22, 1, 0.36, 1);
